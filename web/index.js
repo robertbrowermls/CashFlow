@@ -46,7 +46,7 @@ const server = http.createServer((req, res) => {
 });
 
 // Start server
-const PORT = 3000;
+const PORT = 3002;
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
