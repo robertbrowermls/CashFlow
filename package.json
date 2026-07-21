@@ -1,0 +1,28 @@
+{
+  "name": "daily-task-scheduler",
+  "version": "1.0.0",
+  "description": "TypeScript Node.js app that runs a task every day at the same time",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').cpSync('config.json', 'dist/config.json', { force: true })\" && node -e \"require('fs').cpSync('README.md', 'dist/README.md', { force: true })\" && node -e \"require('fs').cpSync('package.dist.json', 'dist/package.json', { force: true })\" && node -e \"require('fs').cpSync('src/app/templates', 'dist/app/templates', { recursive: true, force: true })\" && node -e \"require('fs').cpSync('web', 'dist/web', { recursive: true, force: true })\" && cd dist && npm install",
+    "web": "cd dist/web && start cmd /k \"npm start\"",
+    "start": "cd dist && npm install && npm start",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "date-holidays": "^3.30.2",
+    "handlebars": "^4.7.9",
+    "lowdb": "^7.0.1",
+    "node-cron": "^3.0.0",
+    "nodemailer": "^8.0.11",
+    "puppeteer": "^25.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^8.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

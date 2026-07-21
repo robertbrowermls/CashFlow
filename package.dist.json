@@ -1,0 +1,19 @@
+{
+  "name": "daily-task-scheduler",
+  "version": "1.0.0",
+  "description": "Compiled runtime for the daily task scheduler",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "date-holidays": "^3.30.2",
+    "handlebars": "^4.7.9",
+    "lowdb": "^7.0.1",
+    "node-cron": "^3.0.0",
+    "nodemailer": "^8.0.11",
+    "puppeteer": "^25.1.0"
+  }
+}

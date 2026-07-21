@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="http://localhost:3000/styles.css" rel="stylesheet">
+  <link href="http://localhost:3000/tableSorting.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Canceled Orders</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="text">Id</th>
+        <th data-type="text">Type</th>
+        <th data-type="text">Symbol</th>
+        <th data-type="text">Side</th>
+        <th data-type="number">Quantity</th>
+        <th data-type="text">Status</th>
+        <th data-type="text">Duration</th>
+        <th data-type="number">Avg Fill Price</th>
+        <th data-type="number">Exec Quantity</th>
+        <th data-type="date">Create Date</th>
+        <th data-type="date">Transaction Date</th>
+        <th data-type="text">Class</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each orders}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{type}}</td>
+        <td>{{symbol}}</td>
+        <td>{{side}}</td>
+        <td>{{quantity}}</td>
+        <td>{{status}}</td>
+        <td>{{duration}}</td>
+        <td>{{avg_fill_price}}</td>
+        <td>{{exec_quantity}}</td>
+        <td>{{datetime create_date en-US America/New_York}}</td>
+        <td>{{datetime transaction_date en-US America/New_York}}</td>
+        <td>{{class}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <script src="http://localhost:3000/tableSorting.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link href="http://localhost:3000/styles.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Account Balance</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th>Total Cash</th>
+        <th>Option Buying Power</th>
+        <th>Stock Buying Power</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{accountBalance.account_number}}</td>
+        <td {{#if (lt accountBalance.total_cash minCashBalance)}}style="color: red;"{{/if}}>{{accountBalance.total_cash}}</td>
+        <td>{{accountBalance.margin.option_buying_power}}</td>
+        <td>{{accountBalance.margin.stock_buying_power}}</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

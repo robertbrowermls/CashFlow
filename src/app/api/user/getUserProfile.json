@@ -1,0 +1,16 @@
+{
+  "profile": {
+    "id": "id-sb-ayivtvla",
+    "name": "Robert Brower",
+    "account": {
+      "account_number": "VA14094031",
+      "classification": "individual",
+      "date_created": "2026-06-02T19:16:54.000Z",
+      "day_trader": false,
+      "option_level": 6,
+      "status": "active",
+      "type": "margin",
+      "last_update_date": "2026-06-02T19:16:54.000Z"
+    }
+  }
+}

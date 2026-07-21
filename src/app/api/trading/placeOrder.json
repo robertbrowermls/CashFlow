@@ -1,0 +1,22 @@
+{
+  "order": {
+    "status": "ok",
+    "commission": 0.7,
+    "cost": 63.7,
+    "fees": 0,
+    "symbol": "SPCE",
+    "type": "credit",
+    "duration": "day",
+    "result": true,
+    "price": 0.37,
+    "order_cost": -37,
+    "margin_change": 100,
+    "option_requirement": 100,
+    "request_date": "2026-06-11T14:12:54.633",
+    "extended_hours": false,
+    "class": "multileg",
+    "strategy": "spread",
+    "day_trades": 0
+  }
+}
+

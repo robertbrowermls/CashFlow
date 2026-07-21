@@ -1,0 +1,25 @@
+body {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+@media screen {
+    body {
+        background: white;
+    }
+}
+
+@media print {
+    body {
+        background: white;
+    }
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: center;
+    border: 1px solid #ddd;
+}

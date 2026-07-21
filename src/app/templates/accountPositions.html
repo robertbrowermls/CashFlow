@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="http://localhost:3000/styles.css" rel="stylesheet">
+  <link href="http://localhost:3000/tableSorting.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Positions</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="text">Id</th>
+        <th data-type="text">Symbol</th>
+        <th data-type="text">Quantity</th>
+        <th data-type="text">Cost Basis</th>
+        <th data-type="text">Date Acquired</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each positions}}
+      <tr>
+        <td>{{id}}</td>
+        <td>{{symbol}}</td>
+        <td>{{quantity}}</td>
+        <td>{{cost_basis}}</td>
+        <td>{{date_acquired}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <script src="http://localhost:3000/tableSorting.js"></script>
+</body>
+
+</html>

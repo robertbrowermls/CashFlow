@@ -1,0 +1,20 @@
+{
+  "positions": {
+    "position": [
+      {
+        "cost_basis": 7954.16,
+        "date_acquired": "2015-01-01T15:25:47.230Z",
+        "id": 40,
+        "quantity": 37,
+        "symbol": "AAPL"
+      },
+      {
+        "cost_basis": 82.75,
+        "date_acquired": "2014-09-01T15:25:47.230Z",
+        "id": 41,
+        "quantity": -2,
+        "symbol": "NFLX"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+curl --request POST \
+     --url https://sandbox.tradier.com/v1/accounts/VA14094031/orders \
+     --header 'Content-Type: application/x-www-form-urlencoded' \
+     --header 'accept: application/json' \
+     --header 'authorization: Bearer Y5BLNcbsi6CQ4siD6s3CZirdjDX0' \
+     --data class=multileg \
+     --data type=credit \
+     --data duration=day \
+     --data preview=true \
+     --data symbol=SPCE \
+     --data price=0.37 \
+     --data-urlencode option_symbol%5B0%5D=SPCE260618P00005000 \
+     --data-urlencode option_symbol%5B1%5D=SPCE260618P00004000 \
+     --data-urlencode side%5B0%5D=sell_to_open \
+     --data-urlencode side%5B1%5D=buy_to_open \
+     --data-urlencode quantity%5B0%5D=1 \
+     --data-urlencode quantity%5B1%5D=1
+
+     class=multileg&symbol=SPCE&type=credit&duration=day&price=0.40&option_symbol%5B0%5D=SPCE260618P00005000&option_symbol%5B1%5D=SPCE260618P00004000&side%5B0%5D=sell_to_open&side%5B1%5D=buy_to_open&quantity%5B0%5D=1&quantity%5B1%5D=1&tag=&preview=true

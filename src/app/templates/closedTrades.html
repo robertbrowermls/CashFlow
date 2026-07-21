@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="http://localhost:3000/styles.css" rel="stylesheet">
+  <link href="http://localhost:3000/tableSorting.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Closed Trades</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="date">Open Timestamp</th>
+        <th data-type="text">Open Short Symbol</th>
+        <th data-type="text">Open Long Symbol</th>
+        <th data-type="number">Open Price</th>
+        <th data-type="date">Open Expiration</th>
+        <th data-type="number">Open S-Strike</th>
+        <th data-type="number">Open L-Strike</th>
+        <th data-type="number">Open S-Bid</th>
+        <th data-type="number">Open S-Ask</th>
+        <th data-type="number">Open L-Bid</th>
+        <th data-type="number">Open L-Ask</th>
+        <th data-type="number">Open Price Adjustment</th>
+        <th data-type="number">Open S-Price</th>
+        <th data-type="number">Open L-Price</th>
+        <th data-type="number">Open Credit</th>
+        <th data-type="number">Open Risk</th>
+        <th data-type="number">Open RoR</th>
+        <th data-type="number">Open Annualized Return</th>
+
+        <th data-type="date">Exit Timestamp</th>
+        <th data-type="text">Exit Short Symbol</th>
+        <th data-type="text">Exit Long Symbol</th>
+        <th data-type="number">Exit Price</th>
+        <th data-type="date">Exit Expiration</th>
+        <th data-type="number">Exit S-Strike</th>
+        <th data-type="number">Exit L-Strike</th>
+        <th data-type="number">Exit S-Bid</th>
+        <th data-type="number">Exit S-Ask</th>
+        <th data-type="number">Exit L-Bid</th>
+        <th data-type="number">Exit L-Ask</th>
+        <th data-type="number">Exit Price Adjustment</th>
+        <th data-type="number">Exit S-Price</th>
+        <th data-type="number">Exit L-Price</th>
+        <th data-type="number">Exit Credit</th>
+        <th data-type="number">Exit Risk</th>
+        <th data-type="number">Exit RoR</th>
+        <th data-type="number">Exit Annualized Return</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      {{#each closedTrades}}
+      <tr>
+        <td>{{datetime open_timestamp en-US America/New_York}}</td>
+        <td>{{open_shortSymbol}}</td>
+        <td>{{open_longSymbol}}</td>
+        <td>{{fixed open_price 2}}</td>
+        <td>{{open_expiration}}</td>
+        <td>{{open_shortStrike}}</td>
+        <td>{{open_longStrike}}</td>
+        <td>{{fixed open_shortBid 2}}</td>
+        <td>{{fixed open_shortAsk 2}}</td>
+        <td>{{fixed open_longBid 2}}</td>
+        <td>{{fixed open_longAsk 2}}</td>
+        <td>{{fixed open_priceAdjustment 2}}</td>
+        <td>{{fixed open_shortPrice 2}}</td>
+        <td>{{fixed open_longPrice 2}}</td>
+        <td>{{fixed open_credit 2}}</td>
+        <td>{{fixed open_risk 2}}</td>
+        <td>{{fixed open_ror 2}}</td>
+        <td>{{fixed open_annualizedReturn 2}}</td>
+
+        <td>{{datetime closed_timestamp en-US America/New_York}}</td>
+        <td>{{closed_shortSymbol}}</td>
+        <td>{{closed_longSymbol}}</td>
+        <td>{{fixed closed_price 2}}</td>
+        <td>{{closed_expiration}}</td>
+        <td>{{closed_shortStrike}}</td>
+        <td>{{closed_longStrike}}</td>
+        <td>{{fixed closed_shortBid 2}}</td>
+        <td>{{fixed closed_shortAsk 2}}</td>
+        <td>{{fixed closed_longBid 2}}</td>
+        <td>{{fixed closed_longAsk 2}}</td>
+        <td>{{fixed closed_priceAdjustment 2}}</td>
+        <td>{{fixed closed_shortPrice 2}}</td>
+        <td>{{fixed closed_longPrice 2}}</td>
+        <td>{{fixed closed_credit 2}}</td>
+        <td>{{fixed closed_risk 2}}</td>
+        <td>{{fixed closed_ror 2}}</td>
+        <td>{{fixed closed_annualizedReturn 2}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <script src="http://localhost:3000/tableSorting.js"></script>
+</body>
+
+</html>

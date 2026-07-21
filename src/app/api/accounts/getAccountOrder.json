@@ -1,0 +1,62 @@
+{
+  "order": {
+    "id": 32747688,
+    "type": "credit",
+    "symbol": "SPCE",
+    "side": "buy",
+    "quantity": 2,
+    "status": "filled",
+    "duration": "day",
+    "price": 0.19,
+    "avg_fill_price": -0.23,
+    "exec_quantity": 2,
+    "last_fill_price": 0,
+    "last_fill_quantity": 1,
+    "remaining_quantity": 0,
+    "create_date": "2026-06-16T13:03:59.574Z",
+    "transaction_date": "2026-06-16T13:46:44.963Z",
+    "class": "multileg",
+    "num_legs": 2,
+    "strategy": "spread",
+    "leg": [
+      {
+        "id": 32747689,
+        "type": "credit",
+        "symbol": "SPCE",
+        "side": "sell_to_open",
+        "quantity": 1,
+        "status": "filled",
+        "duration": "day",
+        "price": 0.19,
+        "avg_fill_price": 0.36,
+        "exec_quantity": 1,
+        "last_fill_price": 0.36,
+        "last_fill_quantity": 1,
+        "remaining_quantity": 0,
+        "create_date": "2026-06-16T13:03:59.574Z",
+        "transaction_date": "2026-06-16T13:46:44.963Z",
+        "class": "option",
+        "option_symbol": "SPCE260626P00003500"
+      },
+      {
+        "id": 32747690,
+        "type": "credit",
+        "symbol": "SPCE",
+        "side": "buy_to_open",
+        "quantity": 1,
+        "status": "filled",
+        "duration": "day",
+        "price": 0.19,
+        "avg_fill_price": 0.13,
+        "exec_quantity": 1,
+        "last_fill_price": 0.13,
+        "last_fill_quantity": 1,
+        "remaining_quantity": 0,
+        "create_date": "2026-06-16T13:03:59.574Z",
+        "transaction_date": "2026-06-16T13:46:44.963Z",
+        "class": "option",
+        "option_symbol": "SPCE260626P00003000"
+      }
+    ]
+  }
+}

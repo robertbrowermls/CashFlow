@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="http://localhost:3000/styles.css" rel="stylesheet">
+  <link href="http://localhost:3000/tableSorting.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Quotes</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="text">Symbol</th>
+        <th data-type="number">Last</th>
+        <th data-type="text">Average Volume</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each quotes}}
+      <tr>
+        <td>{{symbol}}</td>
+        <td>{{last}}</td>
+        <td>{{average_volume}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <script src="http://localhost:3000/tableSorting.js"></script>
+</body>
+
+</html>

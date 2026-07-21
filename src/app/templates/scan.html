@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{appName}}</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="http://localhost:3002/styles.css" rel="stylesheet">
+  <link href="http://localhost:3002/tableSorting.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Best Trades</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="date">Timestamp</th>
+        <th data-type="text">Short Symbol</th>
+        <th data-type="text">Long Symbol</th>
+        <th data-type="number">Price</th>
+        <th data-type="date">Expiration</th>
+        <th data-type="number">S-Strike</th>
+        <th data-type="number">L-Strike</th>
+        <th data-type="number">S-Bid</th>
+        <th data-type="number">S-Ask</th>
+        <th data-type="number">L-Bid</th>
+        <th data-type="number">L-Ask</th>
+        <th data-type="number">Price Adjustment</th>
+        <th data-type="number">S-Price</th>
+        <th data-type="number">L-Price</th>
+        <th data-type="number">Credit</th>
+        <th data-type="number">Risk</th>
+        <th data-type="number">RoR</th>
+        <th data-type="number">Annualized Return</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each trades}}
+      <tr>
+        <td>{{datetime timestamp en-US America/New_York}}</td>
+        <td>{{shortSymbol}}</td>
+        <td>{{longSymbol}}</td>
+        <td>{{fixed price 2}}</td>
+        <td>{{expiration}}</td>
+        <td>{{shortStrike}}</td>
+        <td>{{longStrike}}</td>
+        <td>{{fixed shortBid 2}}</td>
+        <td>{{fixed shortAsk 2}}</td>
+        <td>{{fixed longBid 2}}</td>
+        <td>{{fixed longAsk 2}}</td>
+        <td>{{fixed priceAdjustment 2}}</td>
+        <td>{{fixed shortPrice 2}}</td>
+        <td>{{fixed longPrice 2}}</td>
+        <td>{{fixed credit 2}}</td>
+        <td>{{fixed risk 2}}</td>
+        <td>{{fixed ror 2}}</td>
+        <td>{{fixed annualizedReturn 2}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <h1>Trades By Symbol</h1>
+  {{#each tradesBySymbol}}
+  <h2>{{symbol}}</h2>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th data-type="date">Timestamp</th>
+        <th data-type="text">Short Symbol</th>
+        <th data-type="text">Long Symbol</th>
+        <th data-type="number">Price</th>
+        <th data-type="date">Expiration</th>
+        <th data-type="number">S-Strike</th>
+        <th data-type="number">L-Strike</th>
+        <th data-type="number">S-Bid</th>
+        <th data-type="number">S-Ask</th>
+        <th data-type="number">L-Bid</th>
+        <th data-type="number">L-Ask</th>
+        <th data-type="number">Price Adjustment</th>
+        <th data-type="number">S-Price</th>
+        <th data-type="number">L-Price</th>
+        <th data-type="number">Credit</th>
+        <th data-type="number">Risk</th>
+        <th data-type="number">RoR</th>
+        <th data-type="number">Annualized Return</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each trades}}
+      <tr>
+        <td>{{datetime timestamp en-US America/New_York}}</td>
+        <td>{{shortSymbol}}</td>
+        <td>{{longSymbol}}</td>
+        <td>{{fixed price 2}}</td>
+        <td>{{expiration}}</td>
+        <td>{{shortStrike}}</td>
+        <td>{{longStrike}}</td>
+        <td>{{fixed shortBid 2}}</td>
+        <td>{{fixed shortAsk 2}}</td>
+        <td>{{fixed longBid 2}}</td>
+        <td>{{fixed longAsk 2}}</td>
+        <td>{{fixed priceAdjustment 2}}</td>
+        <td>{{fixed shortPrice 2}}</td>
+        <td>{{fixed longPrice 2}}</td>
+        <td>{{fixed credit 2}}</td>
+        <td>{{fixed risk 2}}</td>
+        <td>{{fixed ror 2}}</td>
+        <td>{{fixed annualizedReturn 2}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{/each}}
+  <script src="http://localhost:3002/tableSorting.js"></script>
+</body>
+
+</html>

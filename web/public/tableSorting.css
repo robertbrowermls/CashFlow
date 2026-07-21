@@ -1,0 +1,30 @@
+/* Base style for sortable headers */
+th {
+    cursor: pointer;
+    position: relative;
+    padding-right: 20px;
+    /* space for arrow */
+}
+
+th[data-type] {
+    text-decoration: underline;
+    color: #0000EE;
+}
+
+/* Ascending arrow */
+th.sort-asc::after {
+    content: "▲";
+    /* Unicode up arrow */
+    position: absolute;
+    right: 5px;
+    font-size: 0.8em;
+}
+
+/* Descending arrow */
+th.sort-desc::after {
+    content: "▼";
+    /* Unicode down arrow */
+    position: absolute;
+    right: 5px;
+    font-size: 0.8em;
+}
