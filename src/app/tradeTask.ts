@@ -1,6 +1,6 @@
 import type { RuntimeConfig } from './config';
 import { getOptionsChains } from './api/market_data/getOptionsChains';
-import { sendErrorEmail, sendInfoEmail, sendWarningEmail } from './email';
+import { sendErrorEmail, sendInfoEmail } from './email';
 import { logger } from './logger';
 import { getHtml } from './puppeteer';
 import { join } from 'path';
@@ -113,8 +113,8 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         const optionsChainsForExpiration = await getOptionsChains(config, quote.symbol, expiration);
         const validOptionsChains = optionsChainsForExpiration.filter(option =>
           option.type === 'option' &&
-          option.option_type === 'put' &&
-          option.strike < quote.last &&
+          option.option_type === 'call' &&
+          option.strike > quote.last &&
           option.bid !== null &&
           option.ask !== null &&
           option.bid !== 0 &&
@@ -123,39 +123,6 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
           !option.root_symbol.endsWith("2"));
         optionsChains.push(...validOptionsChains);
 
-        const pairs = findPricePairs(validOptionsChains, config.MIN_SPREAD, config.MAX_SPREAD);
-        pairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
-
-        for (const pair of pairs) {
-
-          const creditBeforeAdjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
-          const credit = creditBeforeAdjustment + (creditBeforeAdjustment * config.PRICE_ADJUSTMENT);
-          const risk = (pair[0].strike - pair[1].strike) - credit;
-          const ror = credit / risk;
-          const annualizedReturn = 365 / daysFromToday(expiration) * ror;
-
-          trades.push({
-            shortSymbol: pair[0].symbol,
-            longSymbol: pair[1].symbol,
-            underlying: quote.symbol,
-            price: quote.last,
-            expiration: pair[0].expiration_date,
-            shortStrike: pair[0].strike,
-            longStrike: pair[1].strike,
-            shortBid: pair[0].bid,
-            shortAsk: pair[0].ask,
-            longBid: pair[1].bid,
-            longAsk: pair[1].ask,
-            priceAdjustment: config.PRICE_ADJUSTMENT,
-            shortPrice: (pair[0].bid + pair[0].ask) / 2,
-            longPrice: (pair[1].bid + pair[1].ask) / 2,
-            credit,
-            risk,
-            ror,
-            annualizedReturn,
-            timestamp: now.toISOString()
-          });
-        }
       }
 
       optionsChains.sort((a: Option, b: Option) => b.strike - a.strike);
@@ -166,12 +133,53 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         }
       }
 
+      const pairs = findPricePairs(optionsChains, config.MIN_SPREAD, config.MAX_SPREAD);
+      pairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
+
+      for (const pair of pairs) {
+
+        const debitBeforePriceAdjustment = ((pair[1].bid + pair[1].ask) / 2) - ((pair[0].bid + pair[0].ask) / 2);
+        const priceAdjustment = debitBeforePriceAdjustment * config.PRICE_ADJUSTMENT;
+        const debit = debitBeforePriceAdjustment + priceAdjustment;
+        const gain = (pair[0].strike - pair[1].strike) - debit;
+        const ror = gain / debit;
+
+        // CashCow
+        // const creditBeforeAdjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
+        // const credit = creditBeforeAdjustment + (creditBeforeAdjustment * config.PRICE_ADJUSTMENT);
+        // const risk = (pair[0].strike - pair[1].strike) - credit;
+        // const ror = credit / risk;
+        // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
+
+        trades.push({
+          shortSymbol: pair[0].symbol,
+          longSymbol: pair[1].symbol,
+          underlying: quote.symbol,
+          price: quote.last,
+          shortExpiration: pair[0].expiration_date,
+          longExpiration: pair[1].expiration_date,
+          shortStrike: pair[0].strike,
+          longStrike: pair[1].strike,
+          shortBid: pair[0].bid,
+          shortAsk: pair[0].ask,
+          longBid: pair[1].bid,
+          longAsk: pair[1].ask,
+          priceAdjustment: config.PRICE_ADJUSTMENT,
+          shortPrice: (pair[0].bid + pair[0].ask) / 2,
+          longPrice: (pair[1].bid + pair[1].ask) / 2,
+          debit,
+          gain,
+          ror,
+          timestamp: now.toISOString()
+        });
+      }
+
       const tradesForSymbol = trades.filter(trade => {
         return trade.shortStrike <= config.MAX_STOCK_PRICE &&
           trade.shortStrike - trade.longStrike <= config.MAX_SPREAD &&
-          trade.longPrice < trade.shortPrice &&
-          trade.credit >= config.MIN_CREDIT &&
-          daysBetweenDates(trade.expiration, now.toISOString()) >= config.MIN_DAYS_TO_EXPIRATION &&
+          trade.shortPrice < trade.longPrice &&
+          trade.debit >= config.MIN_DEBIT &&
+          daysBetweenDates(trade.shortExpiration, now.toISOString()) >= config.MIN_DAYS_TO_EXPIRATION &&
           trade.ror > config.MIN_ROR
       });
 
@@ -190,7 +198,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
     }
 
     const bestTrades = Object.values(bestTradesLookup);
-    bestTrades.sort((a, b) => b.annualizedReturn - a.annualizedReturn);
+    bestTrades.sort((a, b) => b.ror - a.ror);
 
     if (bestTrades.length > 0) {
       if (config.ENABLE_HTML_REPORTS) {
@@ -227,7 +235,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         continue;
       }
 
-      const price = trade.credit < 0 ? trade.credit * -1 : trade.credit;
+      const price = trade.debit < 0 ? trade.debit * -1 : trade.debit;
       const quantity = 1;
 
       try {
@@ -237,7 +245,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         const placeOrderPreviewResponse = await placeOrder(config,
           accountBalance.account_number,
           trade.underlying,
-          'credit',
+          'debit',
           price,
           [trade.shortSymbol, trade.longSymbol],
           ['sell_to_open', 'buy_to_open'],
@@ -259,7 +267,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         const placeOrderResponse = await placeOrder(config,
           accountBalance.account_number,
           trade.underlying,
-          'credit', // limit doesn't work here
+          'debit', // limit doesn't work here
           price,
           [trade.shortSymbol, trade.longSymbol],
           ['sell_to_open', 'buy_to_open'],
@@ -289,28 +297,6 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         continue;
       }
 
-      // const runTime = new Date(now.getTime() + config.SCHEDULE_CANCEL_OPEN_ORDERS_MINUTES * 60 * 1000);
-      // const minute = runTime.getMinutes();
-      // const hour = runTime.getHours();
-      // const day = runTime.getDate();
-      // const month = runTime.getMonth() + 1; // Cron months are 1-12
-
-      // // Cron format: "m h D M *"
-      // const cronExpression = `${minute} ${hour} ${day} ${month} *`;
-      // logger.info(`Cancel Open Orders Task for symbol ${trade.underlying} scheduled for: ${runTime.toLocaleString()}`);
-
-      // // Schedule the task
-      // const task = cron.schedule(
-      //   cronExpression,
-      //   async () => {
-      //     await runCancelOpenOrdersTask(config, trade.underlying);
-      //   },
-      //   {
-      //     timezone: config.TIMEZONE,
-      //   }
-      // );
-      // task.start();
-
     }
 
     if (ordersPlaced.length > 0) {
@@ -318,13 +304,13 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
       if (config.ENABLE_HTML_REPORTS) {
         reportData.title = 'Orders';
         reportData.trades = db.data!.orders || [];
-        reportData.trades.sort((a, b) => b.annualizedReturn - a.annualizedReturn);
+        reportData.trades.sort((a, b) => b.ror - a.ror);
         getHtml('trades.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_orders.html`));
       }
 
       reportData.title = 'Orders Placed';
       reportData.trades = ordersPlaced;
-      reportData.trades.sort((a, b) => b.annualizedReturn - a.annualizedReturn);
+      reportData.trades.sort((a, b) => b.ror - a.ror);
       const html = getHtml('trades.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_orders_placed.html`), config.ENABLE_HTML_REPORTS);
       await sendInfoEmail(config, html);
 

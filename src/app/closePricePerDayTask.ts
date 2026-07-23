@@ -14,6 +14,7 @@ import { getQuotes } from './api/market_data/getQuotes';
 import { getOptionsChains } from './api/market_data/getOptionsChains';
 import { ReportData } from './reportData';
 import { Trade } from './trade';
+import { Option } from "./api/market_data/getOptionsChainsResponse";
 
 export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<void> {
   logger.info('Close Price Per Day task:', 'Started.');
@@ -91,37 +92,39 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
             }
 
             // If the current price per day is too low then exit.
-            const optionsChains = await getOptionsChains(config, dbTrade.underlying, dbTrade.expiration);
-            const shortPut = optionsChains.find(option => option.symbol === dbTrade.shortSymbol);
-            const longPut = optionsChains.find(option => option.symbol === dbTrade.longSymbol);
+            const optionsChains: Option[] = [];
+            optionsChains.push(...(await getOptionsChains(config, dbTrade.underlying, dbTrade.shortExpiration)));
+            optionsChains.push(...(await getOptionsChains(config, dbTrade.underlying, dbTrade.longExpiration)));
+            const shortCall = optionsChains.find(option => option.symbol === dbTrade.shortSymbol);
+            const longCall = optionsChains.find(option => option.symbol === dbTrade.longSymbol);
 
-            if (!shortPut) {
-              throw new Error(`Failed to find short put with symbol ${dbTrade.shortSymbol}.`);
+            if (!shortCall) {
+              throw new Error(`Failed to find short call with symbol ${dbTrade.shortSymbol}.`);
             }
-            if (!longPut) {
-              throw new Error(`Failed to find long put with symbol ${dbTrade.longSymbol}.`);
+            if (!longCall) {
+              throw new Error(`Failed to find long call with symbol ${dbTrade.longSymbol}.`);
             }
 
             const openTimestamp = dbTrade.timestamp;
-            const openCredit = dbTrade.credit;
-            const openDaysToExpiration = daysBetweenDates(dbTrade.expiration, openTimestamp);
-            const openPricePerDay = openCredit / openDaysToExpiration;
-            const currentCreditBeforeAdjustment = ((shortPut.bid + shortPut.ask) / 2) - ((longPut.bid + longPut.ask) / 2);
-            const currentCredit = currentCreditBeforeAdjustment + (currentCreditBeforeAdjustment * dbTrade.priceAdjustment);
+            const openDebit = dbTrade.debit;
+            const openDaysToExpiration = daysBetweenDates(dbTrade.longExpiration, openTimestamp);
+            const openPricePerDay = openDebit / openDaysToExpiration;
+            const currentDebitBeforeAdjustment = ((longCall.bid + longCall.ask) / 2) - ((shortCall.bid + shortCall.ask) / 2);
+            const priceAdjustment = currentDebitBeforeAdjustment * dbTrade.priceAdjustment;
+            const currentDebit = currentDebitBeforeAdjustment + priceAdjustment;
             const currentTimestamp = now.toISOString();
-            const currentDaysToExpiration = daysBetweenDates(dbTrade.expiration, currentTimestamp);
-            const currentPricePerDay = currentCredit / currentDaysToExpiration;
+            const currentDaysToExpiration = daysBetweenDates(dbTrade.longExpiration, currentTimestamp);
+            const currentPricePerDay = currentDebit / currentDaysToExpiration;
             const currentPricePerDayTooLow = currentPricePerDay < (openPricePerDay * config.PERCENT_PRICE_PER_DAY_TO_EXIT_POSITION);
-            const currentRisk = (shortPut.strike - longPut.strike) - currentCredit;
-            const currentRor = currentCredit / currentRisk;
-            const currentAnnualizedReturn = 365 / daysFromToday(dbTrade.expiration) * currentRor;
+            const currentGain = (shortCall.strike - longCall.strike) - currentDebit;
+            const currentRor = currentGain / currentDebit;
             const quote = quotes[0];
 
             logger.debug('Close Price Per Day task:', `open trade: ${JSON.stringify(dbTrade)}`);
-            logger.debug('Close Price Per Day task:', `current short put: ${JSON.stringify(shortPut)}`);
-            logger.debug('Close Price Per Day task:', `current long put: ${JSON.stringify(longPut)}`);
-            logger.debug('Close Price Per Day task:', `prevCredit: ${openCredit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
-            logger.debug('Close Price Per Day task:', `currentCredit: ${currentCredit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
+            logger.debug('Close Price Per Day task:', `current short call: ${JSON.stringify(shortCall)}`);
+            logger.debug('Close Price Per Day task:', `current long call: ${JSON.stringify(longCall)}`);
+            logger.debug('Close Price Per Day task:', `openDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
+            logger.debug('Close Price Per Day task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
             logger.debug('Close Price Per Day task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
 
             if (!positionsExamined[position.symbol]) {
@@ -183,17 +186,16 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
               const tradeToClose = {
                 ...dbTrade,
                 price: quote.last,
-                shortBid: shortPut.bid,
-                shortAsk: shortPut.ask,
-                longBid: longPut.bid,
-                longAsk: longPut.ask,
+                shortBid: shortCall.bid,
+                shortAsk: shortCall.ask,
+                longBid: longCall.bid,
+                longAsk: longCall.ask,
                 priceAdjustment: dbTrade.priceAdjustment,
-                shortPrice: (shortPut.bid + shortPut.ask) / 2,
-                longPrice: (longPut.bid + longPut.ask) / 2,
-                credit: currentCredit,
-                risk: currentRisk,
+                shortPrice: (shortCall.bid + shortCall.ask) / 2,
+                longPrice: (longCall.bid + longCall.ask) / 2,
+                debit: currentDebit,
+                gain: currentGain,
                 ror: currentRor,
-                annualizedReturn: currentAnnualizedReturn,
                 timestamp: now.toISOString()
               };
 

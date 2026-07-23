@@ -3,7 +3,8 @@ export interface Trade {
   longSymbol: string;
   underlying: string;
   price: number | null;
-  expiration: string;
+  shortExpiration: string;
+  longExpiration: string;
   shortStrike: number;
   longStrike: number;
   shortBid: number;
@@ -13,10 +14,9 @@ export interface Trade {
   priceAdjustment: number;
   shortPrice: number;
   longPrice: number;
-  credit: number;
-  risk: number;
+  debit: number;
+  gain: number;
   ror: number;
-  annualizedReturn: number;
   timestamp: string;
 }
 
@@ -25,7 +25,8 @@ export interface ClosedTrade {
   open_longSymbol: string;
   open_underlying: string;
   open_price: number | null;
-  open_expiration: string;
+  open_shortExpiration: string;
+  open_longExpiration: string;
   open_shortStrike: number;
   open_longStrike: number;
   open_shortBid: number;
@@ -35,16 +36,16 @@ export interface ClosedTrade {
   open_priceAdjustment: number;
   open_shortPrice: number;
   open_longPrice: number;
-  open_credit: number;
-  open_risk: number;
+  open_debit: number;
+  open_gain: number;
   open_ror: number;
-  open_annualizedReturn: number;
   open_timestamp: string;
   closed_shortSymbol: string;
   closed_longSymbol: string;
   closed_underlying: string;
   closed_price: number | null;
-  closed_expiration: string;
+  closed_shortExpiration: string;
+  closed_longExpiration: string;
   closed_shortStrike: number;
   closed_longStrike: number;
   closed_shortBid: number;
@@ -54,10 +55,9 @@ export interface ClosedTrade {
   closed_priceAdjustment: number;
   closed_shortPrice: number;
   closed_longPrice: number;
-  closed_credit: number;
-  closed_risk: number;
+  closed_debit: number;
+  closed_gain: number;
   closed_ror: number;
-  closed_annualizedReturn: number;
   closed_timestamp: string;
 }
 

@@ -20,10 +20,11 @@
     <thead>
       <tr>
         <th data-type="date">Open Timestamp</th>
-        <th data-type="text">Open Short Symbol</th>
-        <th data-type="text">Open Long Symbol</th>
+        <th data-type="text">Open S-Symbol</th>
+        <th data-type="text">Open L-Symbol</th>
         <th data-type="number">Open Price</th>
-        <th data-type="date">Open Expiration</th>
+        <th data-type="date">Open S-Expiration</th>
+        <th data-type="date">Open L-Expiration</th>
         <th data-type="number">Open S-Strike</th>
         <th data-type="number">Open L-Strike</th>
         <th data-type="number">Open S-Bid</th>
@@ -33,29 +34,28 @@
         <th data-type="number">Open Price Adjustment</th>
         <th data-type="number">Open S-Price</th>
         <th data-type="number">Open L-Price</th>
-        <th data-type="number">Open Credit</th>
-        <th data-type="number">Open Risk</th>
+        <th data-type="number">Open Debit</th>
+        <th data-type="number">Open Gain</th>
         <th data-type="number">Open RoR</th>
-        <th data-type="number">Open Annualized Return</th>
 
-        <th data-type="date">Exit Timestamp</th>
-        <th data-type="text">Exit Short Symbol</th>
-        <th data-type="text">Exit Long Symbol</th>
-        <th data-type="number">Exit Price</th>
-        <th data-type="date">Exit Expiration</th>
-        <th data-type="number">Exit S-Strike</th>
-        <th data-type="number">Exit L-Strike</th>
-        <th data-type="number">Exit S-Bid</th>
-        <th data-type="number">Exit S-Ask</th>
-        <th data-type="number">Exit L-Bid</th>
-        <th data-type="number">Exit L-Ask</th>
-        <th data-type="number">Exit Price Adjustment</th>
-        <th data-type="number">Exit S-Price</th>
-        <th data-type="number">Exit L-Price</th>
-        <th data-type="number">Exit Credit</th>
-        <th data-type="number">Exit Risk</th>
-        <th data-type="number">Exit RoR</th>
-        <th data-type="number">Exit Annualized Return</th>
+        <th data-type="date">Closed Timestamp</th>
+        <th data-type="text">Closed S-Symbol</th>
+        <th data-type="text">Closed L-Symbol</th>
+        <th data-type="number">Closed Price</th>
+        <th data-type="date">Closed S-Expiration</th>
+        <th data-type="date">Closed L-Expiration</th>
+        <th data-type="number">Closed S-Strike</th>
+        <th data-type="number">Closed L-Strike</th>
+        <th data-type="number">Closed S-Bid</th>
+        <th data-type="number">Closed S-Ask</th>
+        <th data-type="number">Closed L-Bid</th>
+        <th data-type="number">Closed L-Ask</th>
+        <th data-type="number">Closed Price Adjustment</th>
+        <th data-type="number">Closed S-Price</th>
+        <th data-type="number">Closed L-Price</th>
+        <th data-type="number">Closed Debit</th>
+        <th data-type="number">Closed Gain</th>
+        <th data-type="number">Closed RoR</th>
         
       </tr>
     </thead>
@@ -66,7 +66,8 @@
         <td>{{open_shortSymbol}}</td>
         <td>{{open_longSymbol}}</td>
         <td>{{fixed open_price 2}}</td>
-        <td>{{open_expiration}}</td>
+        <td>{{open_shortExpiration}}</td>
+        <td>{{open_longExpiration}}</td>
         <td>{{open_shortStrike}}</td>
         <td>{{open_longStrike}}</td>
         <td>{{fixed open_shortBid 2}}</td>
@@ -76,16 +77,16 @@
         <td>{{fixed open_priceAdjustment 2}}</td>
         <td>{{fixed open_shortPrice 2}}</td>
         <td>{{fixed open_longPrice 2}}</td>
-        <td>{{fixed open_credit 2}}</td>
-        <td>{{fixed open_risk 2}}</td>
+        <td>{{fixed open_debit 2}}</td>
+        <td>{{fixed open_gain 2}}</td>
         <td>{{fixed open_ror 2}}</td>
-        <td>{{fixed open_annualizedReturn 2}}</td>
 
         <td>{{datetime closed_timestamp en-US America/New_York}}</td>
         <td>{{closed_shortSymbol}}</td>
         <td>{{closed_longSymbol}}</td>
         <td>{{fixed closed_price 2}}</td>
-        <td>{{closed_expiration}}</td>
+        <td>{{closed_shortExpiration}}</td>
+        <td>{{closed_longExpiration}}</td>
         <td>{{closed_shortStrike}}</td>
         <td>{{closed_longStrike}}</td>
         <td>{{fixed closed_shortBid 2}}</td>
@@ -95,10 +96,9 @@
         <td>{{fixed closed_priceAdjustment 2}}</td>
         <td>{{fixed closed_shortPrice 2}}</td>
         <td>{{fixed closed_longPrice 2}}</td>
-        <td>{{fixed closed_credit 2}}</td>
-        <td>{{fixed closed_risk 2}}</td>
+        <td>{{fixed closed_debit 2}}</td>
+        <td>{{fixed closed_gain 2}}</td>
         <td>{{fixed closed_ror 2}}</td>
-        <td>{{fixed closed_annualizedReturn 2}}</td>
       </tr>
       {{/each}}
     </tbody>

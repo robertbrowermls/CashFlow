@@ -1,6 +1,6 @@
 import type { RuntimeConfig } from './config';
 import { getOptionsChains } from './api/market_data/getOptionsChains';
-import { sendErrorEmail, sendInfoEmail, sendWarningEmail } from './email';
+import { sendErrorEmail, sendInfoEmail } from './email';
 import { logger } from './logger';
 import { getHtml } from './puppeteer';
 import { join } from 'path';
@@ -82,8 +82,8 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         const optionsChainsForExpiration = await getOptionsChains(config, quote.symbol, expiration);
         const validOptionsChains = optionsChainsForExpiration.filter(option =>
           option.type === 'option' &&
-          option.option_type === 'put' &&
-          option.strike < quote.last &&
+          option.option_type === 'call' &&
+          option.strike > quote.last &&
           option.bid !== null &&
           option.ask !== null &&
           option.bid !== 0 &&
@@ -92,39 +92,6 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
           !option.root_symbol.endsWith("2"));
         optionsChains.push(...validOptionsChains);
 
-        const pairs = findPricePairs(validOptionsChains, config.MIN_SPREAD, config.MAX_SPREAD);
-        pairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
-
-        for (const pair of pairs) {
-
-          const creditBeforeAjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
-          const credit = creditBeforeAjustment + (creditBeforeAjustment * config.PRICE_ADJUSTMENT);
-          const risk = (pair[0].strike - pair[1].strike) - credit;
-          const ror = credit / risk;
-          const annualizedReturn = 365 / daysFromToday(expiration) * ror;
-
-          trades.push({
-            shortSymbol: pair[0].symbol,
-            longSymbol: pair[1].symbol,
-            underlying: quote.symbol,
-            price: quote.last,
-            expiration: pair[0].expiration_date,
-            shortStrike: pair[0].strike,
-            longStrike: pair[1].strike,
-            shortBid: pair[0].bid,
-            shortAsk: pair[0].ask,
-            longBid: pair[1].bid,
-            longAsk: pair[1].ask,
-            priceAdjustment: config.PRICE_ADJUSTMENT,
-            shortPrice: (pair[0].bid + pair[0].ask) / 2,
-            longPrice: (pair[1].bid + pair[1].ask) / 2,
-            credit,
-            risk,
-            ror,
-            annualizedReturn,
-            timestamp: now.toISOString()
-          });
-        }
       }
 
       optionsChains.sort((a: Option, b: Option) => b.strike - a.strike);
@@ -136,12 +103,53 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         }
       }
 
+      const pairs = findPricePairs(optionsChains, config.MIN_SPREAD, config.MAX_SPREAD);
+      pairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
+
+      for (const pair of pairs) {
+
+        const debitBeforePriceAdjustment = ((pair[1].bid + pair[1].ask) / 2) - ((pair[0].bid + pair[0].ask) / 2);
+        const priceAdjustment = debitBeforePriceAdjustment * config.PRICE_ADJUSTMENT;
+        const debit = debitBeforePriceAdjustment + priceAdjustment;
+        const gain = (pair[0].strike - pair[1].strike) - debit;
+        const ror = gain / debit;
+
+        // CashCow
+        // const creditBeforeAjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
+        // const credit = creditBeforeAjustment + (creditBeforeAjustment * config.PRICE_ADJUSTMENT);
+        // const risk = (pair[0].strike - pair[1].strike) - credit;
+        // const ror = credit / risk;
+        // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
+
+        trades.push({
+          shortSymbol: pair[0].symbol,
+          longSymbol: pair[1].symbol,
+          underlying: quote.symbol,
+          price: quote.last,
+          shortExpiration: pair[0].expiration_date,
+          longExpiration: pair[1].expiration_date,
+          shortStrike: pair[0].strike,
+          longStrike: pair[1].strike,
+          shortBid: pair[0].bid,
+          shortAsk: pair[0].ask,
+          longBid: pair[1].bid,
+          longAsk: pair[1].ask,
+          priceAdjustment: config.PRICE_ADJUSTMENT,
+          shortPrice: (pair[0].bid + pair[0].ask) / 2,
+          longPrice: (pair[1].bid + pair[1].ask) / 2,
+          debit,
+          gain,
+          ror,
+          timestamp: now.toISOString()
+        });
+      }
+
       const tradesForSymbol = trades.filter(trade => {
         return trade.shortStrike <= config.MAX_STOCK_PRICE &&
           trade.shortStrike - trade.longStrike <= config.MAX_SPREAD &&
-          trade.longPrice < trade.shortPrice &&
-          trade.credit >= config.MIN_CREDIT &&
-          daysBetweenDates(trade.expiration, now.toISOString()) >= config.MIN_DAYS_TO_EXPIRATION &&
+          trade.shortPrice < trade.longPrice &&
+          trade.debit >= config.MIN_DEBIT &&
+          daysBetweenDates(trade.shortExpiration, now.toISOString()) >= config.MIN_DAYS_TO_EXPIRATION &&
           trade.ror > config.MIN_ROR
       });
 
@@ -167,7 +175,7 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
       }
     }
 
-    bestTrades.sort((a, b) => b.annualizedReturn - a.annualizedReturn);
+    bestTrades.sort((a, b) => b.ror - a.ror);
 
     if (bestTrades.length === 0) {
       const message = 'No trades found.'
@@ -179,7 +187,7 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
       reportData.trades = bestTrades;
       const symbolsInReport = Object.keys(tradesBySymbol || {}).sort((a, b) => a.localeCompare(b));
       reportData.tradesBySymbol = symbolsInReport.map(symbol => {
-        return { symbol, trades: (tradesBySymbol[symbol] ?? []).sort((a, b) => b.annualizedReturn - a.annualizedReturn) };
+        return { symbol, trades: (tradesBySymbol[symbol] ?? []).sort((a, b) => b.ror - a.ror) };
       });
 
       const html = getHtml('scan.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_scan.html`), config.ENABLE_HTML_REPORTS);

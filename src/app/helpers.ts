@@ -52,8 +52,14 @@ export function findPricePairs<T extends Option>(
             if (i === j) continue; // Skip pairing with itself
 
             const strikeDiff = options[i].strike - options[j].strike;
+            const expirationA = new Date(options[i].expiration_date);
+            const expirationB = new Date(options[j].expiration_date);
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const daysToExpiration = Math.abs(Math.round((expirationA.getTime() - expirationB.getTime()) / msPerDay));
 
-            if (strikeDiff >= minSpread && strikeDiff <= maxSpread) {
+            if (strikeDiff >= minSpread && strikeDiff <= maxSpread &&
+                expirationA.getTime() < expirationB.getTime() &&
+                daysToExpiration === 7) {
                 pairs.push([options[i], options[j]]);
             }
         }
@@ -106,9 +112,15 @@ export function daysFromToday(dateStr: string): number {
 }
 
 export function toFixed(num: number, decimals: number): string {
-    if (!Number.isFinite(num) || decimals < 0) {
-        throw new Error("Invalid input: num must be finite and decimals >= 0");
+    
+    if (decimals < 0) {
+        throw new Error("Invalid input: decimals must be >= 0");
     }
+    
+    if (!Number.isFinite(num)) {
+        return '∞';
+    }
+    
 
     const factor = Math.pow(10, decimals);
     // Truncate toward zero

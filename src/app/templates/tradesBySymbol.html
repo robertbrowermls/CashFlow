@@ -23,10 +23,11 @@
     <thead>
       <tr>
         <th data-type="date">Timestamp</th>
-        <th data-type="text">Short Symbol</th>
-        <th data-type="text">Long Symbol</th>
+        <th data-type="text">S-Symbol</th>
+        <th data-type="text">L-Symbol</th>
         <th data-type="number">Price</th>
-        <th data-type="date">Expiration</th>
+        <th data-type="date">S-Expiration</th>
+        <th data-type="date">L-Expiration</th>
         <th data-type="number">S-Strike</th>
         <th data-type="number">L-Strike</th>
         <th data-type="number">S-Bid</th>
@@ -36,10 +37,9 @@
         <th data-type="number">Price Adjustment</th>
         <th data-type="number">S-Price</th>
         <th data-type="number">L-Price</th>
-        <th data-type="number">Credit</th>
-        <th data-type="number">Risk</th>
+        <th data-type="number">Debit</th>
+        <th data-type="number">Gain</th>
         <th data-type="number">RoR</th>
-        <th data-type="number">Annualized Return</th>
       </tr>
     </thead>
     <tbody>
@@ -49,7 +49,8 @@
         <td>{{shortSymbol}}</td>
         <td>{{longSymbol}}</td>
         <td>{{fixed price 2}}</td>
-        <td>{{expiration}}</td>
+        <td>{{shortExpiration}}</td>
+        <td>{{longExpiration}}</td>
         <td>{{shortStrike}}</td>
         <td>{{longStrike}}</td>
         <td>{{fixed shortBid 2}}</td>
@@ -59,10 +60,9 @@
         <td>{{fixed priceAdjustment 2}}</td>
         <td>{{fixed shortPrice 2}}</td>
         <td>{{fixed longPrice 2}}</td>
-        <td>{{fixed credit 2}}</td>
-        <td>{{fixed risk 2}}</td>
+        <td>{{fixed debit 2}}</td>
+        <td>{{fixed gain 2}}</td>
         <td>{{fixed ror 2}}</td>
-        <td>{{fixed annualizedReturn 2}}</td>
       </tr>
       {{/each}}
     </tbody>
