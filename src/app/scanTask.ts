@@ -113,7 +113,7 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         const validOptionsChains = optionsChainsForExpiration.filter(option =>
           option.type === 'option' &&
           option.option_type === 'call' &&
-          option.strike > quote.last &&
+          option.strike < quote.last &&
           option.bid !== null &&
           option.ask !== null &&
           option.bid !== 0 &&
@@ -134,9 +134,13 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
       }
 
       const pairs = findPricePairs(optionsChains, config.MIN_SPREAD, config.MAX_SPREAD);
-      pairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
+      const highestStrikePrice = pairs.length > 0
+        ? Math.max(...pairs.map(pair => pair[0].strike))
+        : Number.NEGATIVE_INFINITY;
+      const atTheMoneyPairs = pairs.filter(pair => pair[0].strike === highestStrikePrice);
+      atTheMoneyPairs.sort((a: Option[], b: Option[]) => b[0].strike - a[0].strike);
 
-      for (const pair of pairs) {
+      for (const pair of atTheMoneyPairs) {
 
         const debitBeforePriceAdjustment = ((pair[1].bid + pair[1].ask) / 2) - ((pair[0].bid + pair[0].ask) / 2);
         const priceAdjustment = debitBeforePriceAdjustment * config.PRICE_ADJUSTMENT;
