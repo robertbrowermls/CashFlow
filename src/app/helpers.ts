@@ -305,11 +305,11 @@ export function getCompoundingFactor(delta: number, accountProfit: number): numb
     if (typeof delta !== "number" || Number.isNaN(delta) || delta <= 0) {
         throw new Error("Delta must be a positive number.");
     }
-    if (typeof accountProfit !== "number" || Number.isNaN(accountProfit) || accountProfit < 0) {
-        throw new Error("Account profit must be a non-negative number.");
+    if (typeof accountProfit !== "number" || Number.isNaN(accountProfit)) {
+        throw new Error("Account profit must be a number.");
     }
 
-    if (accountProfit === 0) {
+    if (accountProfit <= 0) {
         return 1;
     }
 
