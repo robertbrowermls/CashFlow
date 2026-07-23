@@ -27,17 +27,17 @@
   "daysBeforeExpirationToExitPosition": 1,
   "percentPricePerDayToExitPosition": 0.50,
   "apiBaseUrl": "https://sandbox.tradier.com",
-  "authorization": "Bearer Y5BLNcbsi6CQ4siD6s3CZirdjDX0",
+  "authorization": "Bearer PLACEHOLDER",
   "emailRecipients": [
-    "robert.brower@mlssystems.com"
+    "PLACEHOLDER"
   ],
   "smtp": {
     "host": "smtp.gmail.com",
     "port": 465,
     "secure": true,
-    "user": "robertfbrower@gmail.com",
-    "pass": "fjocipzaxqhwhunc",
-    "from": "robertfbrower@gmail.com"
+    "user": "PLACEHOLDER",
+    "pass": "PLACEHOLDER",
+    "from": "PLACEHOLDER"
   },
   "logging": {
     "level": "info",
