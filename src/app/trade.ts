@@ -18,6 +18,7 @@ export interface Trade {
   gain: number;
   ror: number;
   timestamp: string;
+  quantity: number;
 }
 
 export interface ClosedTrade {
@@ -40,6 +41,7 @@ export interface ClosedTrade {
   open_gain: number;
   open_ror: number;
   open_timestamp: string;
+  open_quantity: number;
   closed_shortSymbol: string;
   closed_longSymbol: string;
   closed_underlying: string;
@@ -59,6 +61,7 @@ export interface ClosedTrade {
   closed_gain: number;
   closed_ror: number;
   closed_timestamp: string;
+  closed_quantity: number;
 }
 
 export interface TradesForSymbol {

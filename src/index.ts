@@ -5,8 +5,8 @@ const config = loadConfig();
 const runtimeConfig = resolveRuntimeConfig(config);
 
 startScanScheduler(runtimeConfig);
-startEmailScheduler(runtimeConfig);
-startTradeScheduler(runtimeConfig);
-startCancelOpenOrdersScheduler(runtimeConfig);
-startCloseExpiringPositionsScheduler(runtimeConfig);
-startClosePricePerDayScheduler(runtimeConfig);
+// startEmailScheduler(runtimeConfig);
+// startTradeScheduler(runtimeConfig);
+// startCancelOpenOrdersScheduler(runtimeConfig);
+// startCloseExpiringPositionsScheduler(runtimeConfig);
+// startClosePricePerDayScheduler(runtimeConfig);

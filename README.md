@@ -41,12 +41,16 @@ The following options are available in `config.json`:
 | Field | Purpose |
 | --- | --- |
 | `appName` | The application name shown in logs and reports |
+| `scanSchedule` | Cron expression for the scan task that identifies trade candidates |
+| `emailSchedule` | Cron expression for sending the daily email report |
 | `tradeSchedule` | Cron expression for when to execute trades; `* * * * 1-5` means every minute, Monday through Friday |
 | `cancelOpenOrdersSchedule` | Cron expression for when to cancel open orders |
 | `closeExpiringPositionsSchedule` | Cron expression for when to check and close expiring positions |
 | `closePricePerDaySchedule` | Cron expression for when to check and close positions with low price per day |
 | `timezone` | Time zone used by the scheduler |
-| `minCashBalance` | Minimum cash balance required to place new trades |
+| `minAccountBalance` | Minimum cash balance required to place new trades |
+| `startingAccountBalance` | Initial account balance used for compounding calculations |
+| `compoundingDelta` | Dollar amount added to the account balance for compounding calculations |
 | `marketTypes` | Array of market types to trade (e.g., `["stock"]`) |
 | `exchangeCodes` | Array of exchange codes to filter stocks (e.g., `["N", "P", "Q"]`) |
 | `maxStockPrice` | Maximum stock price to consider for trading |
@@ -54,6 +58,8 @@ The following options are available in `config.json`:
 | `minAverageVolume` | Minimum average trading volume for a stock |
 | `minSpread` | Minimum spread (bid-ask difference) in dollars |
 | `maxSpread` | Maximum spread (bid-ask difference) in dollars |
+| `minDebit` | Minimum debit amount required for a trade candidate |
+| `minDaysToExpiration` | Minimum number of days remaining before an option expires |
 | `minRor` | Minimum return on risk percentage (0.33 = 33%) |
 | `maxTrades` | Maximum number of concurrent trades allowed |
 | `priceAdjustment` | Price adjustment applied to orders (e.g., -0.02 = 2 cents lower) |
@@ -72,6 +78,7 @@ The following options are available in `config.json`:
 | `smtp.from` | Sender email address used for notifications |
 | `logging.level` | Minimum log level to emit; supports `debug`, `info`, `warn`, `error`, and `log` |
 | `logging.file` | File path for the application log output |
+| `enableHtmlReports` | Enables HTML report generation for scheduled output |
 
 ## Logging
 

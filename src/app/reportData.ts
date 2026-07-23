@@ -12,7 +12,7 @@ export interface ReportData {
   title?: string;
   userProfile?: UserProfile;
   accountBalance?: Balances;
-  minCashBalance?: number;
+  minAccountBalance?: number;
   optionsExpirations?: string[];
   orders?: AccountOrder[];
   positions?: AccountPosition[];

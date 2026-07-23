@@ -2,6 +2,7 @@ import type { RuntimeConfig } from './config';
 import { Option } from './api/market_data/getOptionsChainsResponse';
 import { Trade } from './trade';
 import Holidays from 'date-holidays';
+import { logger } from './logger';
 
 export function buildHeaders(config: RuntimeConfig): HeadersInit {
     const headers: HeadersInit = {
@@ -292,4 +293,51 @@ export function mergeTradesWithPrefixes(
   ) as PrefixKeys<Trade, "closed_">;
 
   return { ...openPrefixed, ...closedPrefixed };
+}
+
+export interface CompoundingRow {
+    accountProfit: number;
+    lotSize: number;
+    nextIncrease: number | null;
+}
+
+export function getCompoundingFactor(delta: number, accountProfit: number): number {
+    if (typeof delta !== "number" || Number.isNaN(delta) || delta <= 0) {
+        throw new Error("Delta must be a positive number.");
+    }
+    if (typeof accountProfit !== "number" || Number.isNaN(accountProfit) || accountProfit < 0) {
+        throw new Error("Account profit must be a non-negative number.");
+    }
+
+    if (accountProfit === 0) {
+        return 1;
+    }
+
+    const rows: CompoundingRow[] = [{ accountProfit: 0, lotSize: 1, nextIncrease: null }];
+
+    let currentAccountProfit = 0;
+    let currentLotSize = 1;
+    let nextIncrease = delta;
+    let bestLotSize = 1;
+
+    while (currentAccountProfit < accountProfit) {
+        bestLotSize = currentLotSize;
+
+        const nextAccountProfit = currentAccountProfit + nextIncrease;
+        const nextLotSize = currentLotSize + 1;
+
+        rows.push({
+            accountProfit: nextAccountProfit,
+            lotSize: nextLotSize,
+            nextIncrease: delta * nextLotSize,
+        });
+
+        currentAccountProfit = nextAccountProfit;
+        currentLotSize = nextLotSize;
+        nextIncrease = delta * currentLotSize;
+    }
+
+    logger.debug(`compounding table = ${JSON.stringify(rows)}`);
+
+    return bestLotSize;
 }

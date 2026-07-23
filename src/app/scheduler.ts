@@ -77,20 +77,20 @@ export function startClosePricePerDayScheduler(config: RuntimeConfig): void {
 }
 
 export function startScanScheduler(config: RuntimeConfig): void {
-  logger.info(`Scan scheduler started. Scan task is set for ${config.SCAN_SCHEDULE} (${config.TIMEZONE}).`);
-  const task = cron.schedule(
-    config.SCAN_SCHEDULE,
-    async () => {
-      await runScanTask(config);
-    },
-    {
-      timezone: config.TIMEZONE,
-    }
-  );
-  task.start();
+  // logger.info(`Scan scheduler started. Scan task is set for ${config.SCAN_SCHEDULE} (${config.TIMEZONE}).`);
+  // const task = cron.schedule(
+  //   config.SCAN_SCHEDULE,
+  //   async () => {
+  //     await runScanTask(config);
+  //   },
+  //   {
+  //     timezone: config.TIMEZONE,
+  //   }
+  // );
+  // task.start();
 
   // Uncomment this line for development purposes to run the task immediately on startup
-  // void runScanTask(config);
+  void runScanTask(config);
 }
 
 export function startEmailScheduler(config: RuntimeConfig): void {

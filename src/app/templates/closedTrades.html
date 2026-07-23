@@ -37,6 +37,7 @@
         <th data-type="number">Open Debit</th>
         <th data-type="number">Open Gain</th>
         <th data-type="number">Open RoR</th>
+        <th data-type="number">Open Quantity</th>
 
         <th data-type="date">Closed Timestamp</th>
         <th data-type="text">Closed S-Symbol</th>
@@ -56,6 +57,7 @@
         <th data-type="number">Closed Debit</th>
         <th data-type="number">Closed Gain</th>
         <th data-type="number">Closed RoR</th>
+        <th data-type="number">Closed Quantity</th>
         
       </tr>
     </thead>
@@ -80,6 +82,7 @@
         <td>{{fixed open_debit 2}}</td>
         <td>{{fixed open_gain 2}}</td>
         <td>{{fixed open_ror 2}}</td>
+        <td>{{open_quantity}}</td>
 
         <td>{{datetime closed_timestamp en-US America/New_York}}</td>
         <td>{{closed_shortSymbol}}</td>
@@ -99,6 +102,7 @@
         <td>{{fixed closed_debit 2}}</td>
         <td>{{fixed closed_gain 2}}</td>
         <td>{{fixed closed_ror 2}}</td>
+        <td>{{closed_quantity}}</td>
       </tr>
       {{/each}}
     </tbody>

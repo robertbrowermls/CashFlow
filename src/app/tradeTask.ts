@@ -11,7 +11,7 @@ import { getAccountBalance } from './api/accounts/getAccountBalance';
 import { getMarketLookup } from './api/market_data/getMarketLookup';
 import { getQuotes } from './api/market_data/getQuotes';
 import { format } from 'date-fns';
-import { daysBetweenDates, daysFromToday, findHighestRateOfReturn, findPricePairs, sanitizeWindowsFilename } from './helpers';
+import { daysBetweenDates, daysFromToday, findHighestRateOfReturn, findPricePairs, getCompoundingFactor, sanitizeWindowsFilename } from './helpers';
 import { Trade } from './trade';
 import { placeOrder } from './api/trading/placeOrder';
 import { DB } from './db';
@@ -35,7 +35,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
 
     const reportData: ReportData = {
       appName: config.APP_NAME,
-      minCashBalance: config.MIN_CASH_BALANCE
+      minAccountBalance: config.MIN_ACCOUNT_BALANCE
     };
 
     const userProfile = await getUserProfile(config);
@@ -54,13 +54,13 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
 
     const accountBalance = await getAccountBalance(config, userProfile.account.account_number);
 
-    if (accountBalance.total_cash < config.MIN_CASH_BALANCE) {
+    if (accountBalance.total_cash < config.MIN_ACCOUNT_BALANCE) {
       if (config.ENABLE_HTML_REPORTS) {
         reportData.accountBalance = accountBalance;
         getHtml('accountBalance.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_account_balance.html`));
       }
 
-      const error = `Total cash (${accountBalance.total_cash}) is below the minimum cash balance of (${config.MIN_CASH_BALANCE}). Consider adding funds to meet the minimum requirement.`;
+      const error = `Total cash (${accountBalance.total_cash}) is below the minimum cash balance of (${config.MIN_ACCOUNT_BALANCE}). Consider adding funds to meet the minimum requirement.`;
       logger.error('Trade task:', error);
       throw new Error(error);
     }
@@ -150,6 +150,22 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         // const risk = (pair[0].strike - pair[1].strike) - credit;
         // const ror = credit / risk;
         // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
+        const maxLoss = config.MAX_SPREAD - config.MAX_SPREAD * config.MIN_ROR;
+        const normalizationFactor = Math.trunc(maxLoss / debit);
+        const accountProfit = accountBalance.total_cash - config.STARTING_ACCOUNT_BALANCE;
+        const delta = config.COMPOUNDING_DELTA ?? Math.trunc((maxLoss / 2) * 100);
+        const compoundingFactor = getCompoundingFactor(delta, accountProfit);
+        const quantity = normalizationFactor * compoundingFactor;
+
+        logger.debug(`maxLoss = ${maxLoss}`);
+        logger.debug(`risk = ${debit}`);
+        logger.debug(`normalizationFactor = ${normalizationFactor}`);
+        logger.debug(`accountBalance.total_cash = ${accountBalance.total_cash}`);
+        logger.debug(`config.STARTING_ACCOUNT_BALANCE = ${config.STARTING_ACCOUNT_BALANCE}`);
+        logger.debug(`accountProfit = ${accountProfit}`);
+        logger.debug(`delta = ${delta}`);
+        logger.debug(`compoundingFactor = ${compoundingFactor}`);
+        logger.debug(`quantity = ${quantity}`);
 
         trades.push({
           shortSymbol: pair[0].symbol,
@@ -170,7 +186,8 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
           debit,
           gain,
           ror,
-          timestamp: now.toISOString()
+          timestamp: now.toISOString(),
+          quantity
         });
       }
 
@@ -236,7 +253,6 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
       }
 
       const price = trade.debit < 0 ? trade.debit * -1 : trade.debit;
-      const quantity = 1;
 
       try {
 
@@ -249,7 +265,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
           price,
           [trade.shortSymbol, trade.longSymbol],
           ['sell_to_open', 'buy_to_open'],
-          quantity,
+          trade.quantity,
           true,
           config.APP_NAME);
 
@@ -271,7 +287,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
           price,
           [trade.shortSymbol, trade.longSymbol],
           ['sell_to_open', 'buy_to_open'],
-          quantity,
+          trade.quantity,
           false,
           config.APP_NAME);
 

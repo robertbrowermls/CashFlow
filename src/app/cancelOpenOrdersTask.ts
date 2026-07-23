@@ -25,7 +25,7 @@ export async function runCancelOpenOrdersTask(config: RuntimeConfig): Promise<vo
 
     const reportData: ReportData = {
       appName: config.APP_NAME,
-      minCashBalance: config.MIN_CASH_BALANCE
+      minAccountBalance: config.MIN_ACCOUNT_BALANCE
     };
 
     const userProfile = await getUserProfile(config);
@@ -42,12 +42,12 @@ export async function runCancelOpenOrdersTask(config: RuntimeConfig): Promise<vo
 
     const accountBalance = await getAccountBalance(config, userProfile.account.account_number);
 
-    if (accountBalance.total_cash < config.MIN_CASH_BALANCE) {
+    if (accountBalance.total_cash < config.MIN_ACCOUNT_BALANCE) {
 
       reportData.accountBalance = accountBalance;
       getHtml('accountBalance.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_account_balance.html`), config.ENABLE_HTML_REPORTS);
 
-      const warning = `Account balance (${accountBalance.total_cash}) is below the minimum cash balance threshold (${config.MIN_CASH_BALANCE}).`;
+      const warning = `Account balance (${accountBalance.total_cash}) is below the minimum cash balance threshold (${config.MIN_ACCOUNT_BALANCE}).`;
       logger.warn('Cancel Open Orders task:', warning);
     }
 

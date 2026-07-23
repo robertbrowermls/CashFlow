@@ -11,7 +11,9 @@ export interface AppConfig {
   closePricePerDaySchedule?: string;
   pricePerDaySchedule?: string;
   timezone?: string;
-  minCashBalance?: number;
+  minAccountBalance?: number;
+  startingAccountBalance?: number;
+  compoundingDelta?: number | null;
   marketTypes?: string[];
   exchangeCodes?: string[];
   maxStockPrice?: number;
@@ -55,7 +57,9 @@ export interface RuntimeConfig {
   CLOSE_EXPIRING_POSITIONS_SCHEDULE: string;
   CLOSE_PRICE_PER_DAY_SCHEDULE: string;
   TIMEZONE: string;
-  MIN_CASH_BALANCE: number;
+  MIN_ACCOUNT_BALANCE: number;
+  STARTING_ACCOUNT_BALANCE: number;
+  COMPOUNDING_DELTA: number | null;
   MARKET_TYPES: string[];
   EXCHANGE_CODES: string[];
   MAX_STOCK_PRICE: number;
@@ -122,7 +126,9 @@ export function resolveRuntimeConfig(config: AppConfig): RuntimeConfig {
     CLOSE_EXPIRING_POSITIONS_SCHEDULE: process.env.CLOSE_EXPIRING_POSITIONS_SCHEDULE || config.closeExpiringPositionsSchedule || "45 15 * * 1-5", // Monday through Friday at 3:45PM
     CLOSE_PRICE_PER_DAY_SCHEDULE: process.env.CLOSE_PRICE_PER_DAY_SCHEDULE || config.closePricePerDaySchedule || "*/5 10-15 * * 1-5", // every five minutes between 10am and 3pm Monday to Friday
     TIMEZONE: runtimeTimezone,
-    MIN_CASH_BALANCE: Number((process.env.MIN_CASH_BALANCE || config.minCashBalance) ?? 2000),
+    MIN_ACCOUNT_BALANCE: Number((process.env.MIN_ACCOUNT_BALANCE || config.minAccountBalance) ?? 2000),
+    STARTING_ACCOUNT_BALANCE: Number((process.env.STARTING_ACCOUNT_BALANCE || config.startingAccountBalance) ?? 2000),
+    COMPOUNDING_DELTA: Number((process.env.COMPOUNDING_DELTA || config.compoundingDelta) ?? null),
     OPTION_EXPIRATION_DATE: optionExpirationDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
     API_BASE_URL: process.env.API_BASE_URL || config.apiBaseUrl || 'https://sandbox.tradier.com',
     AUTHORIZATION: process.env.API_AUTHORIZATION || config.authorization,

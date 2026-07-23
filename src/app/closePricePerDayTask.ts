@@ -26,7 +26,7 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
 
     const reportData: ReportData = {
       appName: config.APP_NAME,
-      minCashBalance: config.MIN_CASH_BALANCE
+      minAccountBalance: config.MIN_ACCOUNT_BALANCE
     };
 
     const userProfile = await getUserProfile(config);
@@ -137,8 +137,6 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
               const exitingMessage = `Attempting to exit ${dbTrade.underlying} because the price per day is too low.`;
               logger.info('Close Price Per Day task:', exitingMessage);
 
-              const quantity = 1; // TODO!
-
               const placeOrderPreviewResponse = await placeOrder(config,
                 userProfile.account.account_number,
                 dbTrade.underlying,
@@ -146,7 +144,7 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
                 null,
                 [dbTrade.shortSymbol, dbTrade.longSymbol],
                 ['buy_to_close', 'sell_to_close'],
-                quantity,
+                dbTrade.quantity,
                 true,
                 config.APP_NAME);
 
@@ -167,7 +165,7 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
                 null,
                 [dbTrade.shortSymbol, dbTrade.longSymbol],
                 ['buy_to_close', 'sell_to_close'],
-                quantity,
+                dbTrade.quantity,
                 false,
                 config.APP_NAME);
 

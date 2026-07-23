@@ -26,7 +26,7 @@
     <tbody>
       <tr>
         <td>{{accountBalance.account_number}}</td>
-        <td {{#if (lt accountBalance.total_cash minCashBalance)}}style="color: red;"{{/if}}>{{accountBalance.total_cash}}</td>
+        <td {{#if (lt accountBalance.total_cash minAccountBalance)}}style="color: red;"{{/if}}>{{accountBalance.total_cash}}</td>
         <td>{{accountBalance.margin.option_buying_power}}</td>
         <td>{{accountBalance.margin.stock_buying_power}}</td>
       </tr>

@@ -9,10 +9,12 @@ import { getOptionsExpirations } from './api/market_data/getOptionsExpirations';
 import { getMarketLookup } from './api/market_data/getMarketLookup';
 import { getQuotes } from './api/market_data/getQuotes';
 import { format } from 'date-fns';
-import { daysBetweenDates, daysFromToday, findHighestRateOfReturn, findPricePairs, sanitizeWindowsFilename } from './helpers';
+import { daysBetweenDates, daysFromToday, findHighestRateOfReturn, findPricePairs, getCompoundingFactor, sanitizeWindowsFilename } from './helpers';
 import { Trade } from './trade';
 import { DB } from './db';
 import { ReportData } from './reportData';
+import { getUserProfile } from './api/user/getUserProfile';
+import { getAccountBalance } from './api/accounts/getAccountBalance';
 
 
 export async function runScanTask(config: RuntimeConfig): Promise<void> {
@@ -32,8 +34,36 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
     logger.info('Scan task:', `Found ${totalTradeCount} trades in the database across ${Object.keys(tradesBySymbol).length} symbols.`);
 
     const reportData: ReportData = {
-      appName: config.APP_NAME
+      appName: config.APP_NAME,
+      minAccountBalance: config.MIN_ACCOUNT_BALANCE
     };
+
+    const userProfile = await getUserProfile(config);
+
+    if (userProfile.account.status !== "active") {
+
+      if (config.ENABLE_HTML_REPORTS) {
+        reportData.userProfile = userProfile;
+        getHtml('userProfile.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_user_profile.html`));
+      }
+
+      const error = `Account status is "${userProfile.account.status}".`;
+      logger.error('Trade task:', error);
+      throw new Error(error);
+    }
+
+    const accountBalance = await getAccountBalance(config, userProfile.account.account_number);
+
+    if (accountBalance.total_cash < config.MIN_ACCOUNT_BALANCE) {
+      if (config.ENABLE_HTML_REPORTS) {
+        reportData.accountBalance = accountBalance;
+        getHtml('accountBalance.html', reportData, join(cwd, `logs/${format(now, 'yyyy-MM-dd-HH-mm')}_account_balance.html`));
+      }
+
+      const error = `Total cash (${accountBalance.total_cash}) is below the minimum cash balance of (${config.MIN_ACCOUNT_BALANCE}). Consider adding funds to meet the minimum requirement.`;
+      logger.error('Trade task:', error);
+      throw new Error(error);
+    }
 
     const marketLookup = await getMarketLookup(config, config.MARKET_TYPES, config.EXCHANGE_CODES);
     if (marketLookup.length === 0) {
@@ -121,6 +151,23 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         // const ror = credit / risk;
         // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
 
+        const maxLoss = config.MAX_SPREAD - config.MAX_SPREAD * config.MIN_ROR;
+        const normalizationFactor = Math.trunc(maxLoss / debit);
+        const accountProfit = accountBalance.total_cash - config.STARTING_ACCOUNT_BALANCE;
+        const delta = config.COMPOUNDING_DELTA ?? Math.trunc((maxLoss / 2) * 100);
+        const compoundingFactor = getCompoundingFactor(delta, accountProfit);
+        const quantity = normalizationFactor * compoundingFactor;
+
+        logger.debug(`maxLoss = ${maxLoss}`);
+        logger.debug(`risk = ${debit}`);
+        logger.debug(`normalizationFactor = ${normalizationFactor}`);
+        logger.debug(`accountBalance.total_cash = ${accountBalance.total_cash}`);
+        logger.debug(`config.STARTING_ACCOUNT_BALANCE = ${config.STARTING_ACCOUNT_BALANCE}`);
+        logger.debug(`accountProfit = ${accountProfit}`);
+        logger.debug(`delta = ${delta}`);
+        logger.debug(`compoundingFactor = ${compoundingFactor}`);
+        logger.debug(`quantity = ${quantity}`);
+
         trades.push({
           shortSymbol: pair[0].symbol,
           longSymbol: pair[1].symbol,
@@ -140,7 +187,8 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
           debit,
           gain,
           ror,
-          timestamp: now.toISOString()
+          timestamp: now.toISOString(),
+          quantity
         });
       }
 

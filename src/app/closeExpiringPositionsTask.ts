@@ -26,7 +26,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
 
     const reportData: ReportData = {
       appName: config.APP_NAME,
-      minCashBalance: config.MIN_CASH_BALANCE
+      minAccountBalance: config.MIN_ACCOUNT_BALANCE
     };
 
     const userProfile = await getUserProfile(config);
@@ -149,8 +149,6 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
               const exitingMessage = `Attempting to exit ${dbTrade.underlying} position because it expires soon.`;
               logger.info('Close Expiring Positions task:', exitingMessage);
 
-              const quantity = 1; // TODO!
-
               const placeOrderPreviewResponse = await placeOrder(config,
                 userProfile.account.account_number,
                 dbTrade.underlying,
@@ -158,7 +156,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
                 null,
                 [dbTrade.shortSymbol, dbTrade.longSymbol],
                 ['buy_to_close', 'sell_to_close'],
-                quantity,
+                dbTrade.quantity,
                 true,
                 config.APP_NAME);
 
@@ -180,7 +178,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
                 null,
                 [dbTrade.shortSymbol, dbTrade.longSymbol],
                 ['buy_to_close', 'sell_to_close'],
-                quantity,
+                dbTrade.quantity,
                 false,
                 config.APP_NAME);
 
