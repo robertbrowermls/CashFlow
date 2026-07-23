@@ -142,18 +142,15 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
 
       for (const pair of atTheMoneyPairs) {
 
-        const debitBeforePriceAdjustment = ((pair[1].bid + pair[1].ask) / 2) - ((pair[0].bid + pair[0].ask) / 2);
-        const priceAdjustment = debitBeforePriceAdjustment * config.PRICE_ADJUSTMENT;
-        const debit = debitBeforePriceAdjustment + priceAdjustment;
-        const gain = (pair[0].strike - pair[1].strike) - debit;
+        const short = pair[0];
+        const long = pair[1];
+        
+        const debitBeforeAdjustment = ((long.bid + long.ask) / 2) - ((short.bid + short.ask) / 2);
+        const priceAdjustment = debitBeforeAdjustment * config.PRICE_ADJUSTMENT;
+        const debit = debitBeforeAdjustment + priceAdjustment;
+        const risk = debit;
+        const gain = (short.strike - long.strike) - debit;
         const ror = gain / debit;
-
-        // CashCow
-        // const creditBeforeAjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
-        // const credit = creditBeforeAjustment + (creditBeforeAjustment * config.PRICE_ADJUSTMENT);
-        const risk = (pair[0].strike - pair[1].strike) - debit;
-        // const ror = credit / risk;
-        // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
 
         const maxLoss = config.MAX_SPREAD - config.MAX_SPREAD * config.MIN_ROR;
         const normalizationFactor = Math.trunc(maxLoss / risk) || 1;
@@ -173,21 +170,21 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         logger.debug(`quantity = ${quantity}`);
 
         trades.push({
-          shortSymbol: pair[0].symbol,
-          longSymbol: pair[1].symbol,
+          shortSymbol: short.symbol,
+          longSymbol: long.symbol,
           underlying: quote.symbol,
           price: quote.last,
-          shortExpiration: pair[0].expiration_date,
-          longExpiration: pair[1].expiration_date,
-          shortStrike: pair[0].strike,
-          longStrike: pair[1].strike,
-          shortBid: pair[0].bid,
-          shortAsk: pair[0].ask,
-          longBid: pair[1].bid,
-          longAsk: pair[1].ask,
+          shortExpiration: short.expiration_date,
+          longExpiration: long.expiration_date,
+          shortStrike: short.strike,
+          longStrike: long.strike,
+          shortBid: short.bid,
+          shortAsk: short.ask,
+          longBid: long.bid,
+          longAsk: long.ask,
           priceAdjustment: config.PRICE_ADJUSTMENT,
-          shortPrice: (pair[0].bid + pair[0].ask) / 2,
-          longPrice: (pair[1].bid + pair[1].ask) / 2,
+          shortPrice: (short.bid + short.ask) / 2,
+          longPrice: (long.bid + long.ask) / 2,
           debit,
           gain,
           ror,
