@@ -147,19 +147,19 @@ export async function runScanTask(config: RuntimeConfig): Promise<void> {
         // CashCow
         // const creditBeforeAjustment = ((pair[0].bid + pair[0].ask) / 2) - ((pair[1].bid + pair[1].ask) / 2);
         // const credit = creditBeforeAjustment + (creditBeforeAjustment * config.PRICE_ADJUSTMENT);
-        // const risk = (pair[0].strike - pair[1].strike) - credit;
+        const risk = (pair[0].strike - pair[1].strike) - debit;
         // const ror = credit / risk;
         // const annualizedReturn = 365 / daysFromToday(expiration) * ror;
 
         const maxLoss = config.MAX_SPREAD - config.MAX_SPREAD * config.MIN_ROR;
-        const normalizationFactor = Math.trunc(maxLoss / debit);
+        const normalizationFactor = Math.trunc(maxLoss / risk) || 1;
         const accountProfit = accountBalance.total_cash - config.STARTING_ACCOUNT_BALANCE;
         const delta = config.COMPOUNDING_DELTA ?? Math.trunc((maxLoss / 2) * 100);
         const compoundingFactor = getCompoundingFactor(delta, accountProfit);
         const quantity = normalizationFactor * compoundingFactor;
 
         logger.debug(`maxLoss = ${maxLoss}`);
-        logger.debug(`risk = ${debit}`);
+        logger.debug(`risk = ${risk}`);
         logger.debug(`normalizationFactor = ${normalizationFactor}`);
         logger.debug(`accountBalance.total_cash = ${accountBalance.total_cash}`);
         logger.debug(`config.STARTING_ACCOUNT_BALANCE = ${config.STARTING_ACCOUNT_BALANCE}`);
