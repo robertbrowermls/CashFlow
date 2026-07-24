@@ -337,7 +337,7 @@ export function getCompoundingFactor(delta: number, accountProfit: number): numb
         nextIncrease = delta * currentLotSize;
     }
 
-    logger.debug(`compounding table = ${JSON.stringify(rows)}`);
+    // logger.debug(`compounding table = ${JSON.stringify(rows)}`);
 
     return bestLotSize;
 }

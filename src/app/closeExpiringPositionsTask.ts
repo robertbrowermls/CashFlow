@@ -119,12 +119,12 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             const currentRor = currentGain / currentDebit;
             const quote = quotes[0];
 
-            logger.debug('Close Expiring Positions task:', `open trade: ${JSON.stringify(dbTrade)}`);
-            logger.debug('Close Expiring Positions task:', `current short call: ${JSON.stringify(shortCall)}`);
-            logger.debug('Close Expiring Positions task:', `current long call: ${JSON.stringify(longCall)}`);
-            logger.debug('Close Expiring Positions task:', `prevDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
-            logger.debug('Close Expiring Positions task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
-            logger.debug('Close Expiring Positions task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
+            // logger.debug('Close Expiring Positions task:', `open trade: ${JSON.stringify(dbTrade)}`);
+            // logger.debug('Close Expiring Positions task:', `current short call: ${JSON.stringify(shortCall)}`);
+            // logger.debug('Close Expiring Positions task:', `current long call: ${JSON.stringify(longCall)}`);
+            // logger.debug('Close Expiring Positions task:', `prevDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
+            // logger.debug('Close Expiring Positions task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
+            // logger.debug('Close Expiring Positions task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
 
             if (!positionsExamined[position.symbol]) {
               positionsExamined[position.symbol] = position;

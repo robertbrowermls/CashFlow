@@ -120,12 +120,12 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
             const currentRor = currentGain / currentDebit;
             const quote = quotes[0];
 
-            logger.debug('Close Price Per Day task:', `open trade: ${JSON.stringify(dbTrade)}`);
-            logger.debug('Close Price Per Day task:', `current short call: ${JSON.stringify(shortCall)}`);
-            logger.debug('Close Price Per Day task:', `current long call: ${JSON.stringify(longCall)}`);
-            logger.debug('Close Price Per Day task:', `openDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
-            logger.debug('Close Price Per Day task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
-            logger.debug('Close Price Per Day task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
+            // logger.debug('Close Price Per Day task:', `open trade: ${JSON.stringify(dbTrade)}`);
+            // logger.debug('Close Price Per Day task:', `current short call: ${JSON.stringify(shortCall)}`);
+            // logger.debug('Close Price Per Day task:', `current long call: ${JSON.stringify(longCall)}`);
+            // logger.debug('Close Price Per Day task:', `openDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
+            // logger.debug('Close Price Per Day task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
+            // logger.debug('Close Price Per Day task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
 
             if (!positionsExamined[position.symbol]) {
               positionsExamined[position.symbol] = position;

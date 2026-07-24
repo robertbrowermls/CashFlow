@@ -159,15 +159,15 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         const compoundingFactor = getCompoundingFactor(delta, accountProfit);
         const quantity = normalizationFactor * compoundingFactor;
 
-        logger.debug(`maxLoss = ${maxLoss}`);
-        logger.debug(`risk = ${risk}`);
-        logger.debug(`normalizationFactor = ${normalizationFactor}`);
-        logger.debug(`accountBalance.total_cash = ${accountBalance.total_cash}`);
-        logger.debug(`config.STARTING_ACCOUNT_BALANCE = ${config.STARTING_ACCOUNT_BALANCE}`);
-        logger.debug(`accountProfit = ${accountProfit}`);
-        logger.debug(`delta = ${delta}`);
-        logger.debug(`compoundingFactor = ${compoundingFactor}`);
-        logger.debug(`quantity = ${quantity}`);
+        // logger.debug(`maxLoss = ${maxLoss}`);
+        // logger.debug(`risk = ${risk}`);
+        // logger.debug(`normalizationFactor = ${normalizationFactor}`);
+        // logger.debug(`accountBalance.total_cash = ${accountBalance.total_cash}`);
+        // logger.debug(`config.STARTING_ACCOUNT_BALANCE = ${config.STARTING_ACCOUNT_BALANCE}`);
+        // logger.debug(`accountProfit = ${accountProfit}`);
+        // logger.debug(`delta = ${delta}`);
+        // logger.debug(`compoundingFactor = ${compoundingFactor}`);
+        // logger.debug(`quantity = ${quantity}`);
 
         trades.push({
           shortSymbol: short.symbol,
