@@ -58,7 +58,7 @@ The following options are available in `config.json`:
 | `minAverageVolume` | Minimum average trading volume for a stock |
 | `minSpread` | Minimum spread (bid-ask difference) in dollars |
 | `maxSpread` | Maximum spread (bid-ask difference) in dollars |
-| `minDebit` | Minimum debit amount required for a trade candidate |
+| `maxDebit` | Maximum debit amount allowed for a trade candidate |
 | `minDaysToExpiration` | Minimum number of days remaining before an option expires |
 | `minRor` | Minimum return on risk percentage (0.33 = 33%) |
 | `maxTrades` | Maximum number of concurrent trades allowed |

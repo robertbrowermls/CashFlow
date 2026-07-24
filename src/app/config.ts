@@ -23,7 +23,7 @@ export interface AppConfig {
   maxSpread?: number;
   minRor?: number;
   maxTrades?: number;
-  minDebit?: number;
+  maxDebit?: number;
   minDaysToExpiration?: number;
   priceAdjustment?: number;
   optionExpirationDays?: number;
@@ -67,7 +67,7 @@ export interface RuntimeConfig {
   MIN_AVERAGE_VOLUME: number;
   MIN_SPREAD: number;
   MAX_SPREAD: number;
-  MIN_DEBIT: number;
+  MAX_DEBIT: number;
   MIN_DAYS_TO_EXPIRATION: number;
   MIN_ROR: number;
   MAX_TRADES: number;
@@ -115,7 +115,7 @@ export function resolveRuntimeConfig(config: AppConfig): RuntimeConfig {
     MIN_SPREAD: (process.env.MIN_SPREAD && parseFloat(process.env.MIN_SPREAD)) || config.minSpread || 0.50,
     MAX_SPREAD: (process.env.MAX_SPREAD && parseFloat(process.env.MAX_SPREAD)) || config.maxSpread || 0.50,
     MIN_ROR: (process.env.MIN_ROR && parseFloat(process.env.MIN_ROR)) || config.minRor || 0.33,
-    MIN_DEBIT: (process.env.MIN_DEBIT && parseFloat(process.env.MIN_DEBIT)) || config.minDebit || 0.25,
+    MAX_DEBIT: (process.env.MAX_DEBIT && parseFloat(process.env.MAX_DEBIT)) || config.maxDebit || 0.50,
     MIN_DAYS_TO_EXPIRATION: (process.env.MIN_DAYS_TO_EXPIRATION && parseInt(process.env.MIN_DAYS_TO_EXPIRATION)) || config.minDaysToExpiration || 7,
     MAX_TRADES: (process.env.MAX_TRADES && parseFloat(process.env.MAX_TRADES)) || config.maxTrades || 1,
     PRICE_ADJUSTMENT: (process.env.PRICE_ADJUSTMENT && parseFloat(process.env.PRICE_ADJUSTMENT)) || config.priceAdjustment || 0.02,

@@ -197,7 +197,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
         return trade.shortStrike <= config.MAX_STOCK_PRICE &&
           trade.shortStrike - trade.longStrike <= config.MAX_SPREAD &&
           trade.shortPrice < trade.longPrice &&
-          trade.debit >= config.MIN_DEBIT &&
+          trade.debit <= config.MAX_DEBIT &&
           daysBetweenDates(trade.shortExpiration, now.toISOString()) >= config.MIN_DAYS_TO_EXPIRATION &&
           trade.ror > config.MIN_ROR
       });
