@@ -221,7 +221,7 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
     if (positionsNotFoundInDb.length > 0) {
       const notFoundMessage = `Positions not found in DB: ${positionsNotFoundInDb.join(', ')}. The app cannot determine if it should exit these positions. Consider manually closing these positions.`;
       logger.info('Close Price Per Day task:', notFoundMessage);
-      await sendWarningEmail(config, notFoundMessage);
+      // await sendWarningEmail(config, notFoundMessage);
     }
 
     const positionsOutOfTheMoney = Object.values(positionsOutOfTheMoneyLookup).map(p => `${p.symbol} (short strike: ${p.shortStrike}, price: ${p.price})`);

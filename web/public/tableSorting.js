@@ -1,42 +1,41 @@
 // jQuery table sorting
 $(document).ready(function () {
-    $("#myTable th").each(function (columnIndex) {
-        $(this).on("click", function () {
-            let table = $(this).parents("table").eq(0);
-            let tbody = table.find("tbody");
-            let rows = tbody.find("tr").toArray();
-            let isAsc = !$(this).hasClass("sort-asc");
-            let type = $(this).data("type");
+    $(document).on("click", "table th", function () {
+        const $header = $(this);
+        const $table = $header.closest("table");
+        const $tbody = $table.children("tbody");
+        const rows = $tbody.children("tr").get();
+        const isAsc = !$header.hasClass("sort-asc");
+        const type = $header.data("type");
+        const columnIndex = $header.index();
 
-            // Remove sort classes from all headers
-            table.find("th").removeClass("sort-asc sort-desc");
+        // Remove sort classes from headers in this table only
+        $table.find("th").removeClass("sort-asc sort-desc");
 
-            // Add the correct sort class to the clicked header
-            $(this).addClass(isAsc ? "sort-asc" : "sort-desc");
+        // Add the correct sort class to the clicked header
+        $header.addClass(isAsc ? "sort-asc" : "sort-desc");
 
-            rows.sort(function (a, b) {
-                let cellA = $(a).children("td").eq(columnIndex).text().trim();
-                let cellB = $(b).children("td").eq(columnIndex).text().trim();
-                // Detect date vs numeric vs text
-                if (type === "date") {
-                    let dateA = new Date(cellA).getTime();
-                    let dateB = new Date(cellB).getTime();
-                    return isAsc ? dateA - dateB : dateB - dateA;
-                } else if (type === "number") {
-                    let numA = parseFloat(cellA);
-                    let numB = parseFloat(cellB);
-                    return isAsc ? numA - numB : numB - numA;
-                } else {
-                    return isAsc
-                        ? cellA.localeCompare(cellB)
-                        : cellB.localeCompare(cellA);
-                }
-            });
+        rows.sort(function (a, b) {
+            const cellA = $(a).children("td").eq(columnIndex).text().trim();
+            const cellB = $(b).children("td").eq(columnIndex).text().trim();
 
-            // Append sorted rows back to tbody
-            $.each(rows, function (_, row) {
-                tbody.append(row);
-            });
+            if (type === "date") {
+                const dateA = new Date(cellA).getTime();
+                const dateB = new Date(cellB).getTime();
+                return isAsc ? dateA - dateB : dateB - dateA;
+            }
+
+            if (type === "number") {
+                const numA = parseFloat(cellA);
+                const numB = parseFloat(cellB);
+                return isAsc ? numA - numB : numB - numA;
+            }
+
+            return isAsc
+                ? cellA.localeCompare(cellB)
+                : cellB.localeCompare(cellA);
         });
+
+        $tbody.append(rows);
     });
 });
