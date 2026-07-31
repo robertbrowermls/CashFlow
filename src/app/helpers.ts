@@ -113,15 +113,22 @@ export function daysFromToday(dateStr: string): number {
 }
 
 export function toFixed(num: number, decimals: number): string {
-    
-    if (decimals < 0) {
-        throw new Error("Invalid input: decimals must be >= 0");
+
+    if (num === null) {
+        return 'null';
+    }
+
+    if (num === undefined) {
+        return 'undefined';
     }
     
     if (!Number.isFinite(num)) {
         return '∞';
     }
-    
+
+    if (decimals < 0) {
+        throw new Error("Invalid input: decimals must be >= 0");
+    }
 
     const factor = Math.pow(10, decimals);
     // Truncate toward zero
