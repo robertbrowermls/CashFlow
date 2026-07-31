@@ -65,6 +65,9 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
       throw new Error(error);
     }
 
+    const accountProfit = accountBalance.total_cash - config.STARTING_ACCOUNT_BALANCE;
+    logger.info('Trade task:', `Account profit = ${accountProfit}.`);
+
     const marketLookup = await getMarketLookup(config, config.MARKET_TYPES, config.EXCHANGE_CODES);
     if (marketLookup.length === 0) {
       const error = `No securities found in market lookup that match the allowed types: ${config.MARKET_TYPES.join(", ")}.}`;
@@ -154,8 +157,7 @@ export async function runTradeTask(config: RuntimeConfig): Promise<void> {
 
         const maxLoss = config.MAX_SPREAD - config.MAX_SPREAD * config.MIN_ROR;
         const normalizationFactor = Math.trunc(maxLoss / risk) || 1;
-        const accountProfit = accountBalance.total_cash - config.STARTING_ACCOUNT_BALANCE;
-        logger.info('Trade task:', `Account profit = ${accountProfit}.`);
+
         const delta = config.COMPOUNDING_DELTA ?? Math.trunc((maxLoss / 2) * 100);
         const compoundingFactor = getCompoundingFactor(delta, accountProfit);
         const quantity = normalizationFactor * compoundingFactor;
