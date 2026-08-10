@@ -161,34 +161,6 @@ export function isMinutesExpired(a: Date, dateB: string, minutes: number): boole
     }
 }
 
-export function isWithinDays(dateObj: Date, targetDateStr: string, days: number): boolean {
-    // Validate days
-    if (!Number.isInteger(days) || days < 0) {
-        throw new Error("Days must be a non-negative integer.");
-    }
-
-    // Validate date string format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDateStr)) {
-        throw new Error("Date string must be in 'yyyy-mm-dd' format.");
-    }
-
-    // Parse target date safely (UTC to avoid timezone issues)
-    const [year, month, day] = targetDateStr.split("-").map(Number);
-    const targetDate = new Date(Date.UTC(year, month - 1, day));
-
-    if (isNaN(targetDate.getTime())) {
-        throw new Error("Invalid target date.");
-    }
-
-    // Normalize both dates to midnight UTC for day-based comparison
-    const givenDateUTC = Date.UTC(dateObj.getUTCFullYear(), dateObj.getUTCMonth(), dateObj.getUTCDate());
-
-    const diffInMs = givenDateUTC - targetDate.getTime();
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-
-    return Math.abs(diffInDays) <= days;
-}
-
 export function isUSFederalHoliday(dateInput: Date | string) {
     try {
         // Create a Holidays instance for the US

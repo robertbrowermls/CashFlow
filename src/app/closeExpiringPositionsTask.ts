@@ -1,5 +1,5 @@
 import type { RuntimeConfig } from './config';
-import { sendErrorEmail, sendInfoEmail, sendWarningEmail } from './email';
+import { sendErrorEmail, sendInfoEmail } from './email';
 import { logger } from './logger';
 import { getHtml } from './puppeteer';
 import { getUserProfile } from './api/user/getUserProfile';
@@ -7,7 +7,7 @@ import { join } from 'path';
 import { format } from 'date-fns';
 import { AccountPosition } from './api/accounts/getAccountPositionsResponse';
 import { getAccountPositions } from './api/accounts/getAccountPositions';
-import { isWithinDays as isWithinDays, isUSFederalHoliday, daysBetweenDates, daysFromToday, mergeTradesWithPrefixes, numTradingDaysBetweenDates } from './helpers';
+import { mergeTradesWithPrefixes, numTradingDaysBetweenDates } from './helpers';
 import { DB } from './db';
 import { placeOrder } from './api/trading/placeOrder';
 import { getQuotes } from './api/market_data/getQuotes';
@@ -75,7 +75,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             // the contract to expire worthless.
             const numDaysToExpiration = numTradingDaysBetweenDates(format(now, 'yyyy-MM-dd'), dbTrade.shortExpiration);
             const quotes = await getQuotes(config, [dbTrade.underlying]);
-            
+
             if (quotes.length === 0) {
               const message = `No quote found for symbol ${dbTrade.underlying}. The app cannot determine if it should exit this position.`;
               logger.warn('Close Expiring Positions task:', message);
