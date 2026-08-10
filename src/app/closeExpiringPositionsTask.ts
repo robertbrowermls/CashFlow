@@ -49,7 +49,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
     const positionsExamined: { [symbol: string]: AccountPosition } = {};
     const tradesClosed: { [symbol: string]: Trade } = {};
     const positionsNotFoundInDb: string[] = [];
-    const positionsOutOfTheMoneyLookup: { [symbol: string]: { symbol: string, shortStrike: number, price: number } } = {};
+    const positionsOutOfTheMoneyLookup: { [symbol: string]: Trade } = {};
 
     if (positions && positions.length > 0) {
 
@@ -84,11 +84,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             if (quotes.length > 0) {
               const quote = quotes[0];
               if (quote.last > dbTrade.shortStrike && numDaysToExpiration > config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION) {
-                positionsOutOfTheMoneyLookup[dbTrade.underlying] = {
-                  symbol: dbTrade.underlying,
-                  shortStrike: dbTrade.shortStrike,
-                  price: quote.last
-                };
+                positionsOutOfTheMoneyLookup[dbTrade.underlying] = dbTrade;
                 continue;
               }
             }
@@ -208,7 +204,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
       // await sendWarningEmail(config, notFoundMessage);
     }
 
-    const positionsOutOfTheMoney = Object.values(positionsOutOfTheMoneyLookup).map(p => `${p.symbol} (short strike: ${p.shortStrike}, price: ${p.price})`);
+    const positionsOutOfTheMoney = Object.values(positionsOutOfTheMoneyLookup).map(p => `${p.underlying} (price: ${p.price} short strike: ${p.shortStrike} expiration: ${p.shortExpiration})`);
     if (positionsOutOfTheMoney.length > 0) {
       const outOfTheMoneyMessage = `Positions out of the money: ${positionsOutOfTheMoney.join(', ')}. The app won't exit these positions because we want to let the contracts expire.`;
       logger.info('Close Expiring Positions task:', outOfTheMoneyMessage);
