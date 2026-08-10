@@ -348,3 +348,45 @@ export function getCompoundingFactor(delta: number, accountProfit: number): numb
 
     return bestLotSize;
 }
+
+export function numTradingDaysBetweenDates(startDateStr: string, endDateStr: string): number {
+    try {
+        const startDate = new Date(`${startDateStr}T00:00:00Z`);
+        const endDate = new Date(`${endDateStr}T00:00:00Z`);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            throw new Error("Invalid date string(s) provided.");
+        }
+
+        const startUTC = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+        const endUTC = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+
+        if (endUTC < startUTC) {
+            return 0;
+        }
+
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const totalDays = Math.max(0, Math.round((endUTC - startUTC) / msPerDay));
+        let tradingDays = 0;
+
+        for (let dayOffset = 0; dayOffset < totalDays; dayOffset++) {
+            const currentDate = new Date(startUTC + (dayOffset * msPerDay));
+            const dayOfWeek = currentDate.getUTCDay();
+
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                continue;
+            }
+
+            if (isUSFederalHoliday(currentDate)) {
+                continue;
+            }
+
+            tradingDays++;
+        }
+
+        return tradingDays;
+    } catch (err) {
+        console.error((err as Error).message);
+        return NaN;
+    }
+}

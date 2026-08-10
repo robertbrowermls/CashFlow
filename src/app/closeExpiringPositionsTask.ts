@@ -7,7 +7,7 @@ import { join } from 'path';
 import { format } from 'date-fns';
 import { AccountPosition } from './api/accounts/getAccountPositionsResponse';
 import { getAccountPositions } from './api/accounts/getAccountPositions';
-import { isWithinDays as isWithinDays, isUSFederalHoliday, daysBetweenDates, daysFromToday, mergeTradesWithPrefixes } from './helpers';
+import { isWithinDays as isWithinDays, isUSFederalHoliday, daysBetweenDates, daysFromToday, mergeTradesWithPrefixes, numTradingDaysBetweenDates } from './helpers';
 import { DB } from './db';
 import { placeOrder } from './api/trading/placeOrder';
 import { getQuotes } from './api/market_data/getQuotes';
@@ -81,7 +81,8 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             }
             if (quotes.length > 0) {
               const quote = quotes[0];
-              if (quote.last > dbTrade.shortStrike) {
+              const numDaysToExpiration = numTradingDaysBetweenDates(now.toISOString(), dbTrade.shortExpiration);
+              if (quote.last > dbTrade.shortStrike && numDaysToExpiration > 0) {
                 positionsOutOfTheMoneyLookup[dbTrade.underlying] = {
                   symbol: dbTrade.underlying,
                   shortStrike: dbTrade.shortStrike,
