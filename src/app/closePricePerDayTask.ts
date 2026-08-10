@@ -7,7 +7,7 @@ import { join } from 'path';
 import { format } from 'date-fns';
 import { AccountPosition } from './api/accounts/getAccountPositionsResponse';
 import { getAccountPositions } from './api/accounts/getAccountPositions';
-import { daysBetweenDates, daysFromToday, mergeTradesWithPrefixes } from './helpers';
+import { daysBetweenDates, daysFromToday, mergeTradesWithPrefixes, numTradingDaysBetweenDates } from './helpers';
 import { DB } from './db';
 import { placeOrder } from './api/trading/placeOrder';
 import { getQuotes } from './api/market_data/getQuotes';
@@ -74,17 +74,18 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
             // exit the position early. Instead we want
             // the contract to expire worthless.
             const quotes = await getQuotes(config, [dbTrade.underlying]);
+            const numDaysToExpiration = numTradingDaysBetweenDates(format(now, 'yyyy-MM-dd'), dbTrade.shortExpiration);
+
             if (quotes.length === 0) {
               const message = `No quote found for symbol ${dbTrade.underlying}. The app cannot determine if it should exit this position.`;
               logger.warn('Close Price Per Day task:', message);
               continue;
             }
-            if (quotes.length > 0) {
-              const quote = quotes[0];
-              if (quote.last > dbTrade.shortStrike) {
-                positionsOutOfTheMoneyLookup[dbTrade.underlying] = dbTrade;
-                continue;
-              }
+
+            const quote = quotes[0];
+            if (quote.last > dbTrade.shortStrike && numDaysToExpiration > config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION) {
+              positionsOutOfTheMoneyLookup[dbTrade.underlying] = dbTrade;
+              continue;
             }
 
             // If the current price per day is too low then exit.
@@ -114,7 +115,6 @@ export async function runClosePricePerDayTask(config: RuntimeConfig): Promise<vo
             const currentPricePerDayTooLow = currentPricePerDay < (openPricePerDay * config.PERCENT_PRICE_PER_DAY_TO_EXIT_POSITION);
             const currentGain = (shortCall.strike - longCall.strike) - currentDebit;
             const currentRor = currentGain / currentDebit;
-            const quote = quotes[0];
 
             // logger.debug('Close Price Per Day task:', `open trade: ${JSON.stringify(dbTrade)}`);
             // logger.debug('Close Price Per Day task:', `current short call: ${JSON.stringify(shortCall)}`);

@@ -81,12 +81,11 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
               logger.warn('Close Expiring Positions task:', message);
               continue;
             }
-            if (quotes.length > 0) {
-              const quote = quotes[0];
-              if (quote.last > dbTrade.shortStrike && numDaysToExpiration > config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION) {
-                positionsOutOfTheMoneyLookup[dbTrade.underlying] = dbTrade;
-                continue;
-              }
+
+            const quote = quotes[0];
+            if (quote.last > dbTrade.shortStrike && numDaysToExpiration > config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION) {
+              positionsOutOfTheMoneyLookup[dbTrade.underlying] = dbTrade;
+              continue;
             }
 
             const optionsChains: Option[] = [];
@@ -107,7 +106,6 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             const currentDebit = currentDebitBeforeAdjustment + priceAdjustment;
             const currentGain = (shortCall.strike - longCall.strike) - currentDebit;
             const currentRor = currentGain / currentDebit;
-            const quote = quotes[0];
 
             if (!positionsExamined[position.symbol]) {
               positionsExamined[position.symbol] = position;
@@ -204,7 +202,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
       // await sendWarningEmail(config, notFoundMessage);
     }
 
-    const positionsOutOfTheMoney = Object.values(positionsOutOfTheMoneyLookup).map(p => `${p.underlying} (price: ${p.price} short strike: ${p.shortStrike} expiration: ${p.shortExpiration})`);
+    const positionsOutOfTheMoney = Object.values(positionsOutOfTheMoneyLookup).map(p => `${p.underlying} (price: ${p.price}, short strike: ${p.shortStrike}, expiration: ${p.shortExpiration})`);
     if (positionsOutOfTheMoney.length > 0) {
       const outOfTheMoneyMessage = `Positions out of the money: ${positionsOutOfTheMoney.join(', ')}. The app won't exit these positions because we want to let the contracts expire.`;
       logger.info('Close Expiring Positions task:', outOfTheMoneyMessage);
