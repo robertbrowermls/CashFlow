@@ -73,7 +73,9 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             // If out of the money we do not want to
             // exit the position early. Instead we want
             // the contract to expire worthless.
+            const numDaysToExpiration = numTradingDaysBetweenDates(format(now, 'yyyy-MM-dd'), dbTrade.shortExpiration);
             const quotes = await getQuotes(config, [dbTrade.underlying]);
+            
             if (quotes.length === 0) {
               const message = `No quote found for symbol ${dbTrade.underlying}. The app cannot determine if it should exit this position.`;
               logger.warn('Close Expiring Positions task:', message);
@@ -81,8 +83,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
             }
             if (quotes.length > 0) {
               const quote = quotes[0];
-              const numDaysToExpiration = numTradingDaysBetweenDates(now.toISOString(), dbTrade.shortExpiration);
-              if (quote.last > dbTrade.shortStrike && numDaysToExpiration > 0) {
+              if (quote.last > dbTrade.shortStrike && numDaysToExpiration > config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION) {
                 positionsOutOfTheMoneyLookup[dbTrade.underlying] = {
                   symbol: dbTrade.underlying,
                   shortStrike: dbTrade.shortStrike,
@@ -105,47 +106,18 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
               throw new Error(`Failed to find long call with symbol ${dbTrade.longSymbol}.`);
             }
 
-            const openTimestamp = dbTrade.timestamp;
-            const openDebit = dbTrade.debit;
-            const openDaysToExpiration = daysBetweenDates(dbTrade.longExpiration, openTimestamp);
-            const openPricePerDay = openDebit / openDaysToExpiration;
             const currentDebitBeforeAdjustment = ((longCall.bid + longCall.ask) / 2) - ((shortCall.bid + shortCall.ask) / 2);
             const priceAdjustment = currentDebitBeforeAdjustment * dbTrade.priceAdjustment;
             const currentDebit = currentDebitBeforeAdjustment + priceAdjustment;
-            const currentTimestamp = now.toISOString();
-            const currentDaysToExpiration = daysBetweenDates(dbTrade.longExpiration, currentTimestamp);
-            const currentPricePerDay = currentDebit / currentDaysToExpiration;
-            const currentPricePerDayTooLow = currentPricePerDay < (openPricePerDay * config.PERCENT_PRICE_PER_DAY_TO_EXIT_POSITION);
             const currentGain = (shortCall.strike - longCall.strike) - currentDebit;
             const currentRor = currentGain / currentDebit;
             const quote = quotes[0];
-
-            // logger.debug('Close Expiring Positions task:', `open trade: ${JSON.stringify(dbTrade)}`);
-            // logger.debug('Close Expiring Positions task:', `current short call: ${JSON.stringify(shortCall)}`);
-            // logger.debug('Close Expiring Positions task:', `current long call: ${JSON.stringify(longCall)}`);
-            // logger.debug('Close Expiring Positions task:', `prevDebit: ${openDebit}, prevDaysToExpiration: ${openDaysToExpiration}, prevPricePerDay: ${openPricePerDay}`);
-            // logger.debug('Close Expiring Positions task:', `currentDebit: ${currentDebit}, currentDaysToExpiration: ${currentDaysToExpiration}, currentPricePerDay: ${currentPricePerDay}`);
-            // logger.debug('Close Expiring Positions task:', `pricePerDayTooLow: ${currentPricePerDayTooLow}`);
 
             if (!positionsExamined[position.symbol]) {
               positionsExamined[position.symbol] = position;
             }
 
-            // If the expiration date is a federal holiday and the daysBeforeExpirationToExitPosition
-            // configuration setting is set to 0 then it must be increased to one so that
-            // th app can exit the position on the day before thr market is closed.
-            let daysBeforeExpirationToExit = config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION;
-            const expiresOnFederalHoliday = isUSFederalHoliday(dbTrade.longExpiration);
-            if (expiresOnFederalHoliday && config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION === 0) {
-              const message = `A position with symbol ${position.symbol} expires on ${dbTrade.longExpiration} which is a federal holiday, and the daysBeforeExpirationToExitPosition setting is 0. The app will exit this position one day earlier.`;
-              logger.info('Close Expiring Positions task:', message);
-              await sendInfoEmail(config, message);
-              daysBeforeExpirationToExit = 1;
-            }
-
-            // Exit the position if it "expires soon".
-            const expiresSoon = isWithinDays(now, dbTrade.longExpiration, daysBeforeExpirationToExit);
-            if ((expiresSoon) && !tradesClosed[dbTrade.underlying]) {
+            if (!tradesClosed[dbTrade.underlying]) {
 
               const exitingMessage = `Attempting to exit ${dbTrade.underlying} position because it expires soon.`;
               logger.info('Close Expiring Positions task:', exitingMessage);
