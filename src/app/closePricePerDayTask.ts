@@ -1,6 +1,6 @@
 import type { RuntimeConfig } from './config';
 import { sendErrorEmail, sendInfoEmail, sendWarningEmail } from './email';
-import { logger } from './logger';
+import { logger } from '../index';
 import { getHtml } from './puppeteer';
 import { getUserProfile } from './api/user/getUserProfile';
 import { join } from 'path';

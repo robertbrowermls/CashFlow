@@ -1,7 +1,7 @@
 import type { RuntimeConfig } from './config';
 import { getOptionsChains } from './api/market_data/getOptionsChains';
 import { sendErrorEmail, sendInfoEmail } from './email';
-import { logger } from './logger';
+import { logger } from '../index';
 import { getHtml } from './puppeteer';
 import { join } from 'path';
 import { Option } from './api/market_data/getOptionsChainsResponse';

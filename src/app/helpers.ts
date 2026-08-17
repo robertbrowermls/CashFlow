@@ -2,7 +2,7 @@ import type { RuntimeConfig } from './config';
 import { Option } from './api/market_data/getOptionsChainsResponse';
 import { Trade } from './trade';
 import Holidays from 'date-holidays';
-import { logger } from './logger';
+import { logger } from '../index';
 
 export function buildHeaders(config: RuntimeConfig): HeadersInit {
     const headers: HeadersInit = {

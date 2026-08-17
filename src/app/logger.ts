@@ -98,7 +98,7 @@ export function createLogger(options: LoggerOptions = {}): {
       return;
     }
 
-    const message = formatMessage(level, args);
+    const message = formatMessage(level, [options.config?.APP_NAME, ...args]);
     getConsoleMethod(level)(message);
     writeToFile(message);
   }
@@ -121,4 +121,4 @@ export function createLogger(options: LoggerOptions = {}): {
   };
 }
 
-export const logger = createLogger();
+

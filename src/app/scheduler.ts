@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import type { RuntimeConfig } from './config';
-import { logger } from './logger';
+import { logger } from '../index';
 import { runTradeTask } from './tradeTask';
 import { runCloseExpiringPositionsTask } from './closeExpiringPositionsTask';
 import { runClosePricePerDayTask } from './closePricePerDayTask';

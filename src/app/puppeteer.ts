@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import handlebars from './handlebars';
 import { join } from 'path/win32';
 import puppeteer, { PDFOptions, SetContentWaitForOptions } from 'puppeteer';
-import { logger } from './logger';
+import { logger } from '../index';
 
 function loadHtml(filePath: string): string {
     try {

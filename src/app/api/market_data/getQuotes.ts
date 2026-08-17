@@ -1,7 +1,6 @@
 import { buildHeaders, chunkArray } from "../../helpers";
 import { RuntimeConfig } from "../../config";
 import { GetQuotesResponse, Quote } from "./getQuotesResponse";
-import { logger } from "../../logger";
 
 export async function getQuotes(config: RuntimeConfig, symbols: string[]): Promise<Quote[]> {
     let quotes: Quote[] = [];

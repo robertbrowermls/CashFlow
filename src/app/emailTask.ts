@@ -1,6 +1,6 @@
 import type { RuntimeConfig } from './config';
 import { sendErrorEmail, sendInfoEmail } from './email';
-import { logger } from './logger';
+import { logger } from '../index';
 import { getHtml } from './puppeteer';
 import { join } from 'path';
 import { format } from 'date-fns';

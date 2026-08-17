@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
 import type { RuntimeConfig } from './config';
-import { logger } from './logger';
+import { logger } from '../index';
 
 function getSmtpSettings(config: RuntimeConfig) {
   return {
