@@ -111,7 +111,7 @@ export async function runCloseExpiringPositionsTask(config: RuntimeConfig): Prom
               positionsExamined[position.symbol] = position;
             }
 
-            if (!tradesClosed[dbTrade.underlying]) {
+            if (numDaysToExpiration <= config.DAYS_BEFORE_EXPIRATION_TO_EXIT_POSITION && !tradesClosed[dbTrade.underlying]) {
 
               const exitingMessage = `Attempting to exit ${dbTrade.underlying} position because it expires soon.`;
               logger.info('Close Expiring Positions task:', exitingMessage);
